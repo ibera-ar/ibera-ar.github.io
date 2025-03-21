@@ -5,7 +5,6 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
-      /* Ocultar botón inicialmente */
       #sound-button {
         position: fixed;
         top: 20px;
@@ -21,12 +20,12 @@
         align-items: center;
         justify-content: center;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        display: none; /* Oculto inicialmente */
+        display: none;
       }
     </style>
   </head>
   <body>
-    <!-- Botón de control de sonido -->
+    <!-- control de sonido -->
     <button id="sound-button" onclick="toggleSound()">🔊</button>
 
     <a-scene 
@@ -36,7 +35,7 @@
       id="ar-scene"
     >
       <a-assets>
-        <!-- Definición de assets para cada target -->
+        <!-- assets para cada target -->
         <!-- 0: aguaraguazu -->
         <a-asset-item id="model-0" src="assets/aguaraguazu.glb"></a-asset-item>
         <audio id="audio-0" src="assets/aguaraguazu.mp3" loop></audio>
@@ -102,9 +101,7 @@
         <audio id="audio-15" src="assets/yetapa.mp3" loop></audio>
       </a-assets>
 
-      <!-- Definición de entidades para cada target -->
-      <!-- Nota: Se puede ajustar la posición, escala y rotación de cada modelo según preferencias -->
-      
+      <!-- entidades para cada target -->      
       <!-- 0: aguaraguazu -->
       <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
         <a-entity gltf-model="#model-0" scale="0.15 0.15 0.15" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
@@ -127,7 +124,7 @@
       
       <!-- 4: ciervo -->
       <a-entity mindar-image-target="targetIndex: 4" data-index="4" id="target-4">
-        <a-entity gltf-model="#model-4" scale="0.05 0.05 0.05" position="0 0 0" rotation="0 0 0" animation-mixer></a-entity>
+        <a-entity gltf-model="#model-4" scale="0.1 0.1 0.1" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
       </a-entity>
       
       <!-- 5: dorado -->
@@ -167,7 +164,7 @@
       
       <!-- 12: tordo -->
       <a-entity mindar-image-target="targetIndex: 12" data-index="12" id="target-12">
-        <a-entity gltf-model="#model-12" scale="0.2 0.2 0.2" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+        <a-entity gltf-model="#model-12" scale="0.8 0.8 0.8" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
       </a-entity>
       
       <!-- 13: venado -->
@@ -182,20 +179,18 @@
       
       <!-- 15: yetapa -->
       <a-entity mindar-image-target="targetIndex: 15" data-index="15" id="target-15">
-        <a-entity gltf-model="#model-15" scale="0.2 0.2 0.2" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+        <a-entity gltf-model="#model-15" scale="0.6 0.6 0.6" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
       </a-entity>
       
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
     </a-scene>
 
     <script>
-      // Variables para manejar el audio
       let isPlaying = false;
       let activeAudio = null;
 
       const soundButton = document.getElementById('sound-button');
 
-      // Creamos un objeto que mapea el índice con su elemento audio correspondiente.
       const audios = {
         0: document.getElementById('audio-0'),
         1: document.getElementById('audio-1'),
@@ -215,7 +210,6 @@
         15: document.getElementById('audio-15')
       };
 
-      // Función para agregar listeners a cada entidad target
       function initTargetListeners(targetEl) {
         targetEl.addEventListener('targetFound', () => {
           const idx = targetEl.getAttribute('data-index');
@@ -236,13 +230,11 @@
         });
       }
 
-      // Inicializamos el listener para cada target
       const targets = document.querySelectorAll('[mindar-image-target]');
       targets.forEach((targetEl) => {
         initTargetListeners(targetEl);
       });
 
-      // Función para alternar la reproducción del audio activo
       function toggleSound() {
         if (!activeAudio) return;
         if (isPlaying) {
