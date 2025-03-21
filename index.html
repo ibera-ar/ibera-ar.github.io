@@ -1,9 +1,257 @@
+<!DOCTYPE html>
 <html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+      /* Ocultar botón inicialmente */
+      #sound-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        background: white;
+        border: 2px solid #ccc;
+        border-radius: 30px;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: none; /* Oculto inicialmente */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Botón de control de sonido -->
+    <button id="sound-button" onclick="toggleSound()">🔊</button>
 
-<body>
-  <h1>CASA IBERÁ</h1>
-  <p>Experiencia de RA por Interm0sh</p>
-  <img src="http://www.workslocal.com.au/wp-content/uploads/2018/04/ar-AUGMENTED-REALITY-LOGO-600x600.png" />
-</body>
+    <a-scene 
+      mindar-image="imageTargetSrc: assets/targets.mind;" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: true"
+      id="ar-scene"
+    >
+      <a-assets>
+        <!-- Definición de assets para cada target -->
+        <!-- 0: aguaraguazu -->
+        <a-asset-item id="model-0" src="assets/aguaraguazu.glb"></a-asset-item>
+        <audio id="audio-0" src="assets/aguaraguazu.mp3" loop></audio>
+        
+        <!-- 1: boacuriyu -->
+        <a-asset-item id="model-1" src="assets/boacuriyu.glb"></a-asset-item>
+        <audio id="audio-1" src="assets/boacuriyu.mp3" loop></audio>
+        
+        <!-- 2: caraya -->
+        <a-asset-item id="model-2" src="assets/caraya.glb"></a-asset-item>
+        <audio id="audio-2" src="assets/caraya.mp3" loop></audio>
+        
+        <!-- 3: carpincho -->
+        <a-asset-item id="model-3" src="assets/carpincho.glb"></a-asset-item>
+        <audio id="audio-3" src="assets/carpincho.mp3" loop></audio>
+        
+        <!-- 4: ciervo -->
+        <a-asset-item id="model-4" src="assets/ciervo.glb"></a-asset-item>
+        <audio id="audio-4" src="assets/ciervo.mp3" loop></audio>
+        
+        <!-- 5: dorado -->
+        <a-asset-item id="model-5" src="assets/dorado.glb"></a-asset-item>
+        <audio id="audio-5" src="assets/dorado.mp3" loop></audio>
+        
+        <!-- 6: jabiru -->
+        <a-asset-item id="model-6" src="assets/jabiru.glb"></a-asset-item>
+        <audio id="audio-6" src="assets/jabiru.mp3" loop></audio>
+        
+        <!-- 7: jacana -->
+        <a-asset-item id="model-7" src="assets/jacana.glb"></a-asset-item>
+        <audio id="audio-7" src="assets/jacana.mp3" loop></audio>
+        
+        <!-- 8: jaguarete -->
+        <a-asset-item id="model-8" src="assets/jaguarete.glb"></a-asset-item>
+        <audio id="audio-8" src="assets/jaguarete.mp3" loop></audio>
+        
+        <!-- 9: nutria -->
+        <a-asset-item id="model-9" src="assets/nutria.glb"></a-asset-item>
+        <audio id="audio-9" src="assets/nutria.mp3" loop></audio>
+        
+        <!-- 10: osohormiguero -->
+        <a-asset-item id="model-10" src="assets/osohormiguero.glb"></a-asset-item>
+        <audio id="audio-10" src="assets/osohormiguero.mp3" loop></audio>
+        
+        <!-- 11: tararira -->
+        <a-asset-item id="model-11" src="assets/tararira.glb"></a-asset-item>
+        <audio id="audio-11" src="assets/tararira.mp3" loop></audio>
+        
+        <!-- 12: tordo -->
+        <a-asset-item id="model-12" src="assets/tordo.glb"></a-asset-item>
+        <audio id="audio-12" src="assets/tordo.mp3" loop></audio>
+        
+        <!-- 13: venado -->
+        <a-asset-item id="model-13" src="assets/venado.glb"></a-asset-item>
+        <audio id="audio-13" src="assets/venado.mp3" loop></audio>
+        
+        <!-- 14: yacare -->
+        <a-asset-item id="model-14" src="assets/yacare.glb"></a-asset-item>
+        <audio id="audio-14" src="assets/yacare.mp3" loop></audio>
+        
+        <!-- 15: yetapa -->
+        <a-asset-item id="model-15" src="assets/yetapa.glb"></a-asset-item>
+        <audio id="audio-15" src="assets/yetapa.mp3" loop></audio>
+      </a-assets>
 
+      <!-- Definición de entidades para cada target -->
+      <!-- Nota: Se puede ajustar la posición, escala y rotación de cada modelo según preferencias -->
+      
+      <!-- 0: aguaraguazu -->
+      <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
+        <a-entity gltf-model="#model-0" scale="0.15 0.15 0.15" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 1: boacuriyu -->
+      <a-entity mindar-image-target="targetIndex: 1" data-index="1" id="target-1">
+        <a-entity gltf-model="#model-1" scale="0.05 0.05 0.05" position="0 0 0" rotation="45 15 0" animation-mixer></a-entity>
+      </a-entity>
+
+      <!-- 2: caraya -->
+      <a-entity mindar-image-target="targetIndex: 2" data-index="2" id="target-2">
+        <a-entity gltf-model="#model-2" scale="0.1 0.1 0.1" position="0 0 0" rotation="-90 0 180" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 3: carpincho -->
+      <a-entity mindar-image-target="targetIndex: 3" data-index="3" id="target-3">
+        <a-entity gltf-model="#model-3" scale="0.7 0.7 0.7" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 4: ciervo -->
+      <a-entity mindar-image-target="targetIndex: 4" data-index="4" id="target-4">
+        <a-entity gltf-model="#model-4" scale="0.05 0.05 0.05" position="0 0 0" rotation="0 0 0" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 5: dorado -->
+      <a-entity mindar-image-target="targetIndex: 5" data-index="5" id="target-5">
+        <a-entity gltf-model="#model-5" scale="0.4 0.4 0.4" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 6: jabiru -->
+      <a-entity mindar-image-target="targetIndex: 6" data-index="6" id="target-6">
+        <a-entity gltf-model="#model-6" scale="0.05 0.05 0.05" position="0 -0.2 0" rotation="45 0 0" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 7: jacana -->
+      <a-entity mindar-image-target="targetIndex: 7" data-index="7" id="target-7">
+        <a-entity gltf-model="#model-7" scale="0.6 0.6 0.6" position="0 -0.2 -0.2" rotation="45 0 0" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 8: jaguarete -->
+      <a-entity mindar-image-target="targetIndex: 8" data-index="8" id="target-8">
+        <a-entity gltf-model="#model-8" scale="0.005 0.005 0.005" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 9: nutria -->
+      <a-entity mindar-image-target="targetIndex: 9" data-index="9" id="target-9">
+        <a-entity gltf-model="#model-9" scale="0.2 0.2 0.2" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 10: osohormiguero -->
+      <a-entity mindar-image-target="targetIndex: 10" data-index="10" id="target-10">
+        <a-entity gltf-model="#model-10" scale="0.15 0.15 0.15" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 11: tararira -->
+      <a-entity mindar-image-target="targetIndex: 11" data-index="11" id="target-11">
+        <a-entity gltf-model="#model-11" scale="0.2 0.2 0.2" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 12: tordo -->
+      <a-entity mindar-image-target="targetIndex: 12" data-index="12" id="target-12">
+        <a-entity gltf-model="#model-12" scale="0.2 0.2 0.2" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 13: venado -->
+      <a-entity mindar-image-target="targetIndex: 13" data-index="13" id="target-13">
+        <a-entity gltf-model="#model-13" scale="0.15 0.15 0.15" position="0 -0.2 0" rotation="0 -90 -45" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 14: yacare -->
+      <a-entity mindar-image-target="targetIndex: 14" data-index="14" id="target-14">
+        <a-entity gltf-model="#model-14" scale="0.28 0.28 0.28" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+      </a-entity>
+      
+      <!-- 15: yetapa -->
+      <a-entity mindar-image-target="targetIndex: 15" data-index="15" id="target-15">
+        <a-entity gltf-model="#model-15" scale="0.2 0.2 0.2" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
+      </a-entity>
+      
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    </a-scene>
+
+    <script>
+      // Variables para manejar el audio
+      let isPlaying = false;
+      let activeAudio = null;
+
+      const soundButton = document.getElementById('sound-button');
+
+      // Creamos un objeto que mapea el índice con su elemento audio correspondiente.
+      const audios = {
+        0: document.getElementById('audio-0'),
+        1: document.getElementById('audio-1'),
+        2: document.getElementById('audio-2'),
+        3: document.getElementById('audio-3'),
+        4: document.getElementById('audio-4'),
+        5: document.getElementById('audio-5'),
+        6: document.getElementById('audio-6'),
+        7: document.getElementById('audio-7'),
+        8: document.getElementById('audio-8'),
+        9: document.getElementById('audio-9'),
+        10: document.getElementById('audio-10'),
+        11: document.getElementById('audio-11'),
+        12: document.getElementById('audio-12'),
+        13: document.getElementById('audio-13'),
+        14: document.getElementById('audio-14'),
+        15: document.getElementById('audio-15')
+      };
+
+      // Función para agregar listeners a cada entidad target
+      function initTargetListeners(targetEl) {
+        targetEl.addEventListener('targetFound', () => {
+          const idx = targetEl.getAttribute('data-index');
+          if (activeAudio && isPlaying) {
+            activeAudio.pause();
+            isPlaying = false;
+          }
+          activeAudio = audios[idx];
+          soundButton.style.display = 'flex';
+        });
+
+        targetEl.addEventListener('targetLost', () => {
+          if (activeAudio && isPlaying) {
+            activeAudio.pause();
+            isPlaying = false;
+          }
+          soundButton.style.display = 'none';
+        });
+      }
+
+      // Inicializamos el listener para cada target
+      const targets = document.querySelectorAll('[mindar-image-target]');
+      targets.forEach((targetEl) => {
+        initTargetListeners(targetEl);
+      });
+
+      // Función para alternar la reproducción del audio activo
+      function toggleSound() {
+        if (!activeAudio) return;
+        if (isPlaying) {
+          activeAudio.pause();
+        } else {
+          activeAudio.play();
+        }
+        isPlaying = !isPlaying;
+      }
+    </script>
+  </body>
 </html>
