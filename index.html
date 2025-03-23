@@ -182,10 +182,10 @@
         <a-entity gltf-model="#model-15" scale="0.6 0.6 0.6" position="0 0 0" rotation="0 -90 -45" animation-mixer></a-entity>
       </a-entity>
       
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: true"></a-camera>
     </a-scene>
 
-    <script>
+<script>
       let isPlaying = false;
       let activeAudio = null;
 
@@ -244,6 +244,6 @@
         }
         isPlaying = !isPlaying;
       }
-    </script>
+    </script> 
   </body>
 </html>

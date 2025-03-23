@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script>
+      AFRAME.registerComponent('additive-shader', {
+        schema: {
+          targetIndex: { type: 'number', default: 0 }
+        },
+        init: function () {
+          const video = document.getElementById(`video${this.data.targetIndex}`);
+          const texture = new THREE.VideoTexture(video);
+
+          const material = new THREE.ShaderMaterial({
+            uniforms: {
+              baseTexture: { value: texture },
+              threshold: { value: 0.2 }
+            },
+            vertexShader: `
+              varying vec2 vUv;
+              void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `,
+            fragmentShader: `
+              uniform sampler2D baseTexture;
+              uniform float threshold;
+              varying vec2 vUv;
+
+              void main() {
+                vec4 color = texture2D(baseTexture, vUv);
+                float luminance = dot(color.rgb, vec3(0.299, 0.587, 0.114)); 
+                if (luminance < threshold) {
+                  discard; 
+                }
+                gl_FragColor = vec4(color.rgb, 1.0); 
+              }
+            `,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthTest: false
+          });
+
+          this.el.getObject3D('mesh').material = material;
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene mindar-image="imageTargetSrc: assets/targets-panel.mind;" 
+             vr-mode-ui="enabled: false" 
+             device-orientation-permission-ui="enabled: false">
+      
+      <a-assets>
+        <!-- 0: Aguaraguazu -->
+        <video id="video0" autoplay loop muted playsinline 
+              src="assets/aguaraguazu.webm"></video>
+        
+        <!-- 1: Chuna -->
+        <video id="video1" autoplay loop muted playsinline 
+              src="assets/chuna.webm"></video>
+        
+        <!-- 2: Guacamayo -->
+        <video id="video2" autoplay loop muted playsinline 
+              src="assets/guacamayo.webm"></video>
+        
+        <!-- 3: Muitu -->
+        <video id="video3" autoplay loop muted playsinline 
+              src="assets/muitu.webm"></video>
+        
+        <!-- 4: Nutria -->
+        <video id="video4" autoplay loop muted playsinline 
+              src="assets/nutria.webm"></video>
+        
+        <!-- 5: Ocelote -->
+        <video id="video5" autoplay loop muted playsinline 
+              src="assets/ocelote.webm"></video>
+        
+        <!-- 6: Tamandua -->
+        <video id="video6" autoplay loop muted playsinline 
+              src="assets/tamandua.webm"></video>
+        
+        <!-- 7: Venado -->
+        <video id="video7" autoplay loop muted playsinline 
+              src="assets/venado.webm"></video>
+        
+        <!-- 8: Yaguarete -->
+        <video id="video8" autoplay loop muted playsinline 
+              src="assets/yaguarete.webm"></video>
+      </a-assets>
+
+
+      <!-- Targets repetidos para cada índice -->
+       <!-- 0: Aguara Guazu -->
+
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-plane width="1.5" height="1.2" position="0 0 0" 
+                 additive-shader="targetIndex: 0"></a-plane>
+      </a-entity>
+
+      <!-- 1: Chuna -->
+      <a-entity mindar-image-target="targetIndex: 1">
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 1"></a-plane>
+      </a-entity>
+
+      <!-- 2: Guacamayo -->
+      <a-entity mindar-image-target="targetIndex: 2">
+        <a-plane width="1.5" height="1.2" position="0 0 0"         additive-shader="targetIndex: 2"></a-plane>
+      </a-entity>
+
+      <!-- 3: Muitu -->
+      <a-entity mindar-image-target="targetIndex: 3" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         additive-shader="targetIndex: 3"></a-plane>
+      </a-entity>
+
+      <!-- 4: Nutria -->
+      <a-entity mindar-image-target="targetIndex: 4" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         additive-shader="targetIndex: 4"></a-plane>
+      </a-entity>
+
+      <!-- 5: Ocelote -->
+      <a-entity mindar-image-target="targetIndex: 5">
+        <a-plane width="1.5" height="1.2" position="0 0 0"         additive-shader="targetIndex: 5"></a-plane>
+      </a-entity>
+
+      <!-- 6: Tamandua -->
+      <a-entity mindar-image-target="targetIndex: 6" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         additive-shader="targetIndex: 6"></a-plane>
+      </a-entity>
+
+      <!-- 7: Venado -->
+      <a-entity mindar-image-target="targetIndex: 7" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         additive-shader="targetIndex: 7"></a-plane>
+      </a-entity>
+
+      <!-- 8: Yaguarete -->
+      <a-entity mindar-image-target="targetIndex: 8" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         additive-shader="targetIndex: 8"></a-plane>
+      </a-entity>
+      <!-- ... (los mismos 9 targets que en la respuesta anterior) ... -->
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    </a-scene>
+  </body>
+</html>
