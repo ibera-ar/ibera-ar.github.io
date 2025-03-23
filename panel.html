@@ -52,7 +52,7 @@
   <body>
     <a-scene mindar-image="imageTargetSrc: assets/targets-panel.mind;" 
              vr-mode-ui="enabled: false" 
-             device-orientation-permission-ui="enabled: false">
+             device-orientation-permission-ui="enabled: true">
       
       <a-assets>
         <!-- 0: Aguaraguazu -->
@@ -148,7 +148,8 @@
         <a-plane width="1.5" height="1.2" position="0 0 0"         
         additive-shader="targetIndex: 8"></a-plane>
       </a-entity>
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-camera position="0 0 0" look-controls="enabled: true"></a-camera>
 
     </a-scene>
   </body>
