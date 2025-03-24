@@ -9,10 +9,19 @@
         schema: {
           targetIndex: { type: 'number', default: 0 }
         },
+        
+
         init: function () {
+        // Obtener índice del target padre
+        const targetIndex = this.el.parentElement.getAttribute('target-index');
+          
+
+          // Obtener video correspondiente al índice
           const video = document.getElementById(`video${this.data.targetIndex}`);
+          // const video = document.getElementById(`video${targetIndex}`);
           const texture = new THREE.VideoTexture(video);
 
+          // Crear material con shader
           const material = new THREE.ShaderMaterial({
             uniforms: {
               baseTexture: { value: texture },
@@ -44,15 +53,29 @@
             depthTest: false
           });
 
+          // this.el.getObject3D('mesh').material = material;
+          // Asignar material al mesh
           this.el.getObject3D('mesh').material = material;
+          // texture.needsUpdate = true;
         }
+      });
+
+            // Listener para iniciar la reproducción del video tras la primera interacción del usuario en dispositivos móviles
+            document.addEventListener('touchstart', function initVideo() {
+        const video = document.getElementById('muitu');
+        if (video.paused) {
+          video.play();
+        }
+        document.removeEventListener('touchstart', initVideo);
       });
     </script>
   </head>
   <body>
     <a-scene mindar-image="imageTargetSrc: assets/targets-panel.mind;" 
              vr-mode-ui="enabled: false" 
-             device-orientation-permission-ui="enabled: true">
+             device-orientation-permission-ui="enabled: true"
+             id="ar-scene"
+             >
       
       <a-assets>
         <!-- 0: Aguaraguazu -->
@@ -96,7 +119,7 @@
       <!-- Targets -->
        <!-- 0: Aguara Guazu -->
 
-      <a-entity mindar-image-target="targetIndex: 0">
+      <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
         <a-plane width="1.5" height="1.2" position="0 0 0" 
                  additive-shader="targetIndex: 0"></a-plane>
       </a-entity>
@@ -149,7 +172,7 @@
         additive-shader="targetIndex: 8"></a-plane>
       </a-entity>
 
-      <a-camera position="0 0 0" look-controls="enabled: true"></a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
     </a-scene>
   </body>
