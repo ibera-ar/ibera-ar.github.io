@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script>
+      AFRAME.registerComponent('additive-shader', {
+        schema: {
+          targetIndex: { type: 'number', default: 0 }
+        },
+
+        init: function () {
+          // Obtener video correspondiente al índice
+          const video = document.getElementById(`video${this.data.targetIndex}`);
+          const texture = new THREE.VideoTexture(video);
+
+          // Optimización de textura
+          texture.minFilter = THREE.LinearFilter;
+          texture.magFilter = THREE.LinearFilter;
+          texture.format = THREE.RGBAFormat;
+
+          // Crear material con shader optimizado
+          const material = new THREE.ShaderMaterial({
+            uniforms: {
+              baseTexture: { value: texture },
+              threshold: { value: 0.3 } 
+            },
+            vertexShader: `
+              varying vec2 vUv;
+              void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `,
+            fragmentShader: `
+              uniform sampler2D baseTexture;
+              uniform float threshold;
+              varying vec2 vUv;
+
+              void main() {
+                vec4 color = texture2D(baseTexture, vUv);
+                // Cálculo de luminancia optimizado
+                float luminance = (color.r + color.g + color.b) * 0.333;
+                // Transparencia en lugar de discard
+                gl_FragColor = vec4(color.rgb, step(threshold, luminance));
+              }
+            `,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthTest: false,
+            uniformsNeedUpdate: true
+          });
+
+          this.el.getObject3D('mesh').material = material;
+        }
+      });
+
+      // Manejo mejorado de reproducción de videos
+      document.addEventListener('DOMContentLoaded', () => {
+        const videos = Array.from(document.querySelectorAll('video'));
+        
+        const playAllVideos = async () => {
+          try {
+            await Promise.all(videos.map(video => video.play()));
+          } catch (error) {
+            console.log('Reintentando reproducción...');
+            setTimeout(playAllVideos, 500);
+          }
+        };
+
+        document.addEventListener('touchstart', playAllVideos, { once: true });
+        document.addEventListener('click', playAllVideos, { once: true });
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene mindar-image="imageTargetSrc: assets/targets-panel.mind;" 
+             vr-mode-ui="enabled: false" 
+             device-orientation-permission-ui="enabled: true"
+             renderer="antialias: false; highRefreshRate: true"
+             id="ar-scene">
+      
+      <a-assets>
+        <!-- Videos optimizados (720p y VP9) -->
+        <video id="video0" preload="auto" autoplay loop playsinline muted 
+              src="assets/aguaraguazu.webm" crossorigin="anonymous"></video>
+        <video id="video1" preload="auto" autoplay loop playsinline muted 
+              src="assets/chuna.webm" crossorigin="anonymous"></video>
+        <video id="video2" preload="auto" autoplay loop playsinline muted 
+              src="assets/guacamayo.webm" crossorigin="anonymous"></video>
+        <video id="video3" preload="auto" autoplay loop playsinline muted 
+              src="assets/muitu.webm" crossorigin="anonymous"></video>
+        <video id="video4" preload="auto" autoplay loop playsinline muted 
+              src="assets/nutria.webm" crossorigin="anonymous"></video>
+        <video id="video5" preload="auto" autoplay loop playsinline muted 
+              src="assets/ocelote.webm" crossorigin="anonymous"></video>
+        <video id="video6" preload="auto" autoplay loop playsinline muted 
+              src="assets/tamandua.webm" crossorigin="anonymous"></video>
+        <video id="video7" preload="auto" autoplay loop playsinline muted 
+              src="assets/venado.webm" crossorigin="anonymous"></video>
+        <video id="video8" preload="auto" autoplay loop playsinline muted 
+              src="assets/yaguarete.webm" crossorigin="anonymous"></video>
+      </a-assets>
+
+
+      <!-- Targets -->
+       <!-- 0: Aguara Guazu -->
+
+       <a-entity mindar-image-target="targetIndex: 0">
+        <a-plane width="1.5" height="1.2" position="0 0 0" 
+                 additive-shader="targetIndex: 0"></a-plane>
+      </a-entity>
+
+      <!-- 1: Chuna -->
+      <a-entity mindar-image-target="targetIndex: 1">
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 1"></a-plane>
+      </a-entity>
+
+      <!-- 2: Guacamayo -->
+      <a-entity mindar-image-target="targetIndex: 2">
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 2"></a-plane>
+      </a-entity>
+
+      <!-- 3: Muitu -->
+      <a-entity mindar-image-target="targetIndex: 3" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 3"></a-plane>
+      </a-entity>
+
+      <!-- 4: Nutria -->
+      <a-entity mindar-image-target="targetIndex: 4" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 4"></a-plane>
+      </a-entity>
+
+      <!-- 5: Ocelote -->
+      <a-entity mindar-image-target="targetIndex: 5">
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 5"></a-plane>
+      </a-entity>
+
+      <!-- 6: Tamandua -->
+      <a-entity mindar-image-target="targetIndex: 6" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 6"></a-plane>
+      </a-entity>
+
+      <!-- 7: Venado -->
+      <a-entity mindar-image-target="targetIndex: 7" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 7"></a-plane>
+      </a-entity>
+
+      <!-- 8: Yaguarete -->
+      <a-entity mindar-image-target="targetIndex: 8" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 8"></a-plane>
+      </a-entity>
+
+
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    </a-scene>
+  </body>
+</html>
