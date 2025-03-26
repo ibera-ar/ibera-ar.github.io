@@ -5,19 +5,26 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <script>
-      AFRAME.registerComponent('optimized-shader', {
-        init: function () {
-          const video = document.getElementById('muitu');
-          const texture = new THREE.VideoTexture(video);
-          
-          // Optimización de muestreo de textura
-          texture.minFilter = THREE.NearestFilter;
-          texture.magFilter = THREE.NearestFilter;
+      AFRAME.registerComponent('additive-shader', {
+        schema: {
+          targetIndex: { type: 'number', default: 0 }
+        },
 
+        init: function () {
+          // Obtener video correspondiente al índice
+          const video = document.getElementById(`video${this.data.targetIndex}`);
+          const texture = new THREE.VideoTexture(video);
+
+          // Optimización de textura
+          texture.minFilter = THREE.LinearFilter;
+          texture.magFilter = THREE.LinearFilter;
+          texture.format = THREE.RGBAFormat;
+
+          // Crear material con shader optimizado
           const material = new THREE.ShaderMaterial({
             uniforms: {
               baseTexture: { value: texture },
-              threshold: { value: 0.4 } // Umbral reducido para mayor eficiencia
+              threshold: { value: 0.3 } 
             },
             vertexShader: `
               varying vec2 vUv;
@@ -30,25 +37,18 @@
               uniform sampler2D baseTexture;
               uniform float threshold;
               varying vec2 vUv;
-              
+
               void main() {
                 vec4 color = texture2D(baseTexture, vUv);
-                
-                // Cálculo de luminancia simplificado (más rápido)
-                float luminance = (color.r + color.g + color.b) / 3.0;
-                
-                // Evitar discard usando alpha blending
-                if (luminance < threshold) {
-                  gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-                } else {
-                  gl_FragColor = vec4(color.rgb, 1.0);
-                }
+                // Cálculo de luminancia optimizado
+                float luminance = (color.r + color.g + color.b) * 0.333;
+                // Transparencia en lugar de discard
+                gl_FragColor = vec4(color.rgb, step(threshold, luminance));
               }
             `,
             transparent: true,
             blending: THREE.AdditiveBlending,
             depthTest: false,
-            // Optimización de actualización
             uniformsNeedUpdate: true
           });
 
@@ -56,49 +56,199 @@
         }
       });
 
-      document.addEventListener('touchstart', function initVideo() {
-        const video = document.getElementById('muitu');
-        if (video.paused) {
-          video.play().catch(error => {
+      // Manejo mejorado de reproducción de videos
+      document.addEventListener('DOMContentLoaded', () => {
+        const videos = Array.from(document.querySelectorAll('video'));
+        
+        const playAllVideos = async () => {
+          try {
+            await Promise.all(videos.map(video => video.play()));
+          } catch (error) {
             console.log('Reintentando reproducción...');
-            // Forzar reproducción en segundo plano
-            setTimeout(() => video.play(), 500);
-          });
-        }
-        document.removeEventListener('touchstart', initVideo);
+            setTimeout(playAllVideos, 500);
+          }
+        };
+
+        document.addEventListener('touchstart', playAllVideos, { once: true });
+        document.addEventListener('click', playAllVideos, { once: true });
       });
     </script>
   </head>
   <body>
-    <a-scene mindar-image="imageTargetSrc: assets/muitu.mind;" 
+    <a-scene mindar-image="imageTargetSrc: assets/targets-panel.mind;" 
              vr-mode-ui="enabled: false" 
-             device-orientation-permission-ui="enabled: false"
-             renderer="antialias: false; highRefreshRate: true">
-             
+             device-orientation-permission-ui="enabled: true"
+             renderer="antialias: false; highRefreshRate: true"
+             id="ar-scene">
+      
       <a-assets>
-        <!-- Optimización de video -->
-        <video id="muitu" 
-               preload="auto" 
-               src="assets/muitu.webm" 
-               autoplay 
-               loop 
-               playsinline 
-               muted
-               crossorigin="anonymous">
-        </video>
+        <!-- Videos optimizados (720p y VP9) -->
+        <video id="video0" preload="auto" autoplay loop playsinline muted 
+              src="assets/aguaraguazu.webm" crossorigin="anonymous"></video>
+        <video id="video1" preload="auto" autoplay loop playsinline muted 
+              src="assets/chuna.webm" crossorigin="anonymous"></video>
+        <video id="video2" preload="auto" autoplay loop playsinline muted 
+              src="assets/guacamayo.webm" crossorigin="anonymous"></video>
+        <video id="video3" preload="auto" autoplay loop playsinline muted 
+              src="assets/muitu.webm" crossorigin="anonymous"></video>
+        <video id="video4" preload="auto" autoplay loop playsinline muted 
+              src="assets/nutria.webm" crossorigin="anonymous"></video>
+        <video id="video5" preload="auto" autoplay loop playsinline muted 
+              src="assets/ocelote.webm" crossorigin="anonymous"></video>
+        <video id="video6" preload="auto" autoplay loop playsinline muted 
+              src="assets/tamandua.webm" crossorigin="anonymous"></video>
+        <video id="video7" preload="auto" autoplay loop playsinline muted 
+              src="assets/venado.webm" crossorigin="anonymous"></video>
+        <video id="video8" preload="auto" autoplay loop playsinline muted 
+              src="assets/yaguarete.webm" crossorigin="anonymous"></video>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-      
-      <a-entity mindar-image-target="targetIndex: 0">
-        <!-- Geometría optimizada -->
-        <a-plane width="1.2" 
-                 height="0.9" 
-                 position="0 0 0" 
-                 optimized-shader
-                 >
-        </a-plane>
+
+      <!-- Targets -->
+       <!-- 0: Aguara Guazu -->
+
+       <a-entity mindar-image-target="targetIndex: 0">
+        <a-plane width="1.5" height="1.2" position="0 0 0" 
+                 additive-shader="targetIndex: 0"></a-plane>
       </a-entity>
+
+      <!-- 1: Chuna -->
+      <a-entity mindar-image-target="targetIndex: 1">
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 1"></a-plane>
+      </a-entity>
+
+      <!-- 2: Guacamayo -->
+      <a-entity mindar-image-target="targetIndex: 2">
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 2"></a-plane>
+      </a-entity>
+
+      <!-- 3: Muitu -->
+      <a-entity mindar-image-target="targetIndex: 3" >
+        <a-plane width="1.3" height="1.0" position="0 0 0"         
+        additive-shader="targetIndex: 3"></a-plane>
+      </a-entity>
+
+      <!-- 4: Nutria -->
+      <a-entity mindar-image-target="targetIndex: 4" >
+        <a-plane width="1.3" height="1.0" position="0 0 0"         
+        additive-shader="targetIndex: 4"></a-plane>
+      </a-entity>
+
+      <!-- 5: Ocelote -->
+      <a-entity mindar-image-target="targetIndex: 5">
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 5"></a-plane>
+      </a-entity>
+
+      <!-- 6: Tamandua -->
+      <a-entity mindar-image-target="targetIndex: 6" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 6"></a-plane>
+      </a-entity>
+
+      <!-- 7: Venado -->
+      <a-entity mindar-image-target="targetIndex: 7" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 7"></a-plane>
+      </a-entity>
+
+      <!-- 8: Yaguarete -->
+      <a-entity mindar-image-target="targetIndex: 8" >
+        <a-plane width="1.5" height="1.2" position="0 0 0"         
+        additive-shader="targetIndex: 8"></a-plane>
+      </a-entity>
+
+
+
+      <a-camera position="0 0 0" look-controls="enabled: true"></a-camera>
     </a-scene>
+    <script>
+  
+    // let isPlaying = false;
+    // let activeAudio = null;
+  
+    // const soundButton = document.getElementById('sound-button');
+  
+    // const audios = {
+    //   0: document.getElementById('audio-0'),
+    //   1: document.getElementById('audio-1'),
+    //   2: document.getElementById('audio-2'),
+    //   3: document.getElementById('audio-3'),
+    //   4: document.getElementById('audio-4'),
+    //   5: document.getElementById('audio-5'),
+    //   6: document.getElementById('audio-6'),
+    //   7: document.getElementById('audio-7'),
+    //   8: document.getElementById('audio-8'),
+    //   9: document.getElementById('audio-9'),
+    // };
+  
+  
+  
+  function playAnimation(targetEl) {
+  const modelEl = targetEl.querySelector('[gltf-model]');
+  if (modelEl) {
+  console.log('Set animation mixer att:', targetEl.id);
+  modelEl.setAttribute('animation-mixer', "clip: *; loop: repeat");
+  }
+  }
+  
+  
+  // // Función para detener la animación (opcionalmente se puede remover el componente).
+  // Aquí se remueve el componente para detenerla.
+  function stopAnimation(targetEl) {
+  const modelEl = targetEl.querySelector('[gltf-model]');
+  if (modelEl) {
+    console.log('Remove animation mixer att:', targetEl.id);
+  
+    modelEl.removeAttribute('animation-mixer');
+  }
+  }
+  
+  
+    function initTargetListeners(targetEl) {
+      targetEl.addEventListener('targetFound', () => {
+        console.log('Target found:', targetEl.id);
+        // const idx = targetEl.getAttribute('data-index');
+        // if (activeAudio && isPlaying) {
+        //   activeAudio.pause();
+        //   isPlaying = false;
+        // }
+        // activeAudio = audios[idx];
+        // soundButton.style.display = 'flex';
+  
+        //   // Llama a la función para reproducir la animación
+        //   playAnimation(targetEl);
+      });
+  
+      targetEl.addEventListener('targetLost', () => {
+        console.log('Target lost:', targetEl.id);
+        // if (activeAudio && isPlaying) {
+        //   activeAudio.pause();
+        //   isPlaying = false;
+        // }
+        // soundButton.style.display = 'none';
+  
+          // Llama a la función para detener la animación
+          // stopAnimation(targetEl);
+      });
+    }
+  
+    const targets = document.querySelectorAll('[mindar-image-target]');
+    targets.forEach((targetEl) => {
+      initTargetListeners(targetEl);
+    });
+  
+    // function toggleSound() {
+    //   if (!activeAudio) return;
+    //   if (isPlaying) {
+    //     activeAudio.pause();
+    //   } else {
+    //     activeAudio.play();
+    //   }
+    //   isPlaying = !isPlaying;
+    // }
+  </script> 
   </body>
 </html>
