@@ -8,7 +8,7 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #ffffff;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
             color: #333333;
             text-align: center;
             padding: 20px;
@@ -60,21 +60,50 @@
             color: white;
             font-size: 18px;
             padding: 20px;
-            background: #4CAF50;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
             border-radius: 10px;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             display: block;
             transform: perspective(1px) translateZ(0);
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
 
         .menu a:hover {
-            background: #45a049;
+            background: linear-gradient(135deg, #45a049, #3d8b40);
             transform: scale(1.02);
         }
 
         .menu a:active {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             transform: scale(0.95);
+            transition-duration: 0.1s;
+        }
+
+        /* Efecto de onda al hacer clic */
+        .menu a:active::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.4), transparent 70%);
+            border-radius: 50%;
+            animation: ripple 0.6s ease-out forwards;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2);
+                opacity: 0;
+            }
         }
 
         @keyframes fadeIn {
@@ -90,9 +119,9 @@
 </head>
 <body>
     <div class="header">
+        <img src="icon.jpg" alt="Icono">
         <h1>Iberá AR</h1>
         <p>Descubre la experiencia en realidad aumentada de Casa Iberá</p>
-        <img src="icon.jpg" alt="Icono">
     </div>
 
     <ul class="menu">
