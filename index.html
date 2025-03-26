@@ -8,48 +8,93 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: white;
+            background-color: #ffffff;
+            color: #333333;
             text-align: center;
+            padding: 20px;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
         }
+
+        .header {
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0 0 15px;
+            color: #2d542c;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            margin: 0 0 20px;
+            max-width: 600px;
+        }
+
+        .header img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
         .menu {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            max-width: 600px;
-            width: 90%;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
             list-style: none;
             padding: 0;
-            background: #222;
-            padding: 20px;
-            border-radius: 10px;
         }
-        .menu li {
-            display: flex;
-            justify-content: center;
-        }
+
         .menu a {
             text-decoration: none;
             color: white;
             font-size: 18px;
-            padding: 15px;
-            background: #333;
-            border-radius: 5px;
-            transition: background 0.3s;
+            padding: 20px;
+            background: #4CAF50;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             display: block;
-            width: 100%;
-            text-align: center;
+            transform: perspective(1px) translateZ(0);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
         }
+
         .menu a:hover {
-            background: #555;
+            background: #45a049;
+            transform: scale(1.02);
+        }
+
+        .menu a:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1>Iberá AR</h1>
+        <p>Descubre la experiencia en realidad aumentada de Casa Iberá</p>
+        <img src="icon.jpg" alt="Icono">
+    </div>
+
     <ul class="menu">
         <li><a href="postas.html">Experiencia Sector Postas</a></li>
         <li><a href="panel.html">Experiencia Sector Panel</a></li>
