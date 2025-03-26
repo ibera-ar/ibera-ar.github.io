@@ -4,6 +4,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <!-- Polyfill para navegadores muy antiguos -->
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
     <style>      .a-enter-vr-button {
       display: none; 
     }</style>
@@ -23,6 +25,9 @@ renderer.extensions.get('OES_texture_float_linear');
       console.error(`[Shader] Video ${videoId} no encontrado`);
       return;
     }
+
+    const floatLinearExt = renderer.extensions.get('OES_texture_float_linear');
+if (!floatLinearExt) console.warn("Floating point textures not supported");
 
             // 1. Forzar actualización de textura en móvil
             let texture = null;
@@ -49,7 +54,7 @@ renderer.extensions.get('OES_texture_float_linear');
           }
         `,
         fragmentShader: `
-          precision mediump float;
+          precision highp float;
           uniform sampler2D baseTexture;
           uniform float threshold;
           varying vec2 vUv;
@@ -97,19 +102,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // document.addEventListener('touchstart', playAllVideos, { once: true });
-  // document.addEventListener('click', playAllVideos, { once: true });
+  document.addEventListener('touchstart', playAllVideos, { once: true });
+  document.addEventListener('click', playAllVideos, { once: true });
 });</script>
 
 
   </head>
   <body>
     <!-- renderer="antialias: false; highRefreshRate: true" -->
+    <!-- renderer="antialias: false; precision: highp; powerPreference: high-performance" -->
     <a-scene mindar-image="imageTargetSrc: assets/targets-panel.mind;" 
              vr-mode-ui="enabled: false" 
              device-orientation-permission-ui="enabled: true"
             
-             renderer="antialias: true; highRefreshRate: false; precision: mediump"
+             renderer="antialias: false; highRefreshRate: false; precision: mediump"
              id="ar-scene"
              loaded="console.log('Escena y assets cargados')">
       
@@ -244,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+console.log('Ibera-AR version 0.9');
   </script> 
   </body>
 </html>
