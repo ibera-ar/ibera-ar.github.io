@@ -7,31 +7,33 @@
     <style>      .a-enter-vr-button {
       display: none; 
     }</style>
-  <script>
-    AFRAME.registerComponent('additive-shader', {
-      schema: { 
-        targetIndex: { type: 'number', default: 0 }
-      },
+    <script>
+      AFRAME.registerComponent('additive-shader', {
+        schema: {
+          targetIndex: { type: 'number', default: 0 }
+        },
 
-      init: function () {
-        const videoId = `video${this.data.targetIndex}`;
-        const video = document.getElementById(videoId);
-
-        if (!video) {
-          console.error(`[Shader] Video ${videoId} no encontrado`);
-          return;
-        }
-
-        const createMaterial = () => {
+        init: function () {
+          // Obtener video correspondiente al índice
+          const video = document.getElementById(`video${this.data.targetIndex}`);
+          
           const texture = new THREE.VideoTexture(video);
+
+          if (!video) {
+      console.error(`Video ${videoId} no encontrado`);
+      return;
+    }
+
+          // Optimización de textura
           texture.minFilter = THREE.LinearFilter;
           texture.magFilter = THREE.LinearFilter;
           texture.format = THREE.RGBAFormat;
 
+          // Crear material con shader optimizado
           const material = new THREE.ShaderMaterial({
             uniforms: {
               baseTexture: { value: texture },
-              threshold: { value: 0.2 }
+              threshold: { value: 0.2 } 
             },
             vertexShader: `
               varying vec2 vUv;
@@ -44,52 +46,47 @@
               uniform sampler2D baseTexture;
               uniform float threshold;
               varying vec2 vUv;
-              
+
               void main() {
                 vec4 color = texture2D(baseTexture, vUv);
+                // Cálculo de luminancia optimizado
                 float luminance = (color.r + color.g + color.b) * 0.333;
+                // Transparencia en lugar de discard
                 gl_FragColor = vec4(color.rgb, step(threshold, luminance));
               }
             `,
             transparent: true,
             blending: THREE.AdditiveBlending,
-            depthTest: false
+            depthTest: false,
+            uniformsNeedUpdate: true
           });
 
           this.el.getObject3D('mesh').material = material;
-        };
-
-        if (video.readyState >= video.HAVE_CURRENT_DATA) {
-          createMaterial();
-        } else {
-          video.addEventListener('loadeddata', createMaterial);
-          video.addEventListener('error', (e) => {
-            console.error(`[Video ${videoId}] Error:`, e.target.error);
-          });
         }
-      }
-    });
+      });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const videos = Array.from(document.querySelectorAll('video'));
-      
-      const playAllVideos = async () => {
-        try {
-          await Promise.all(videos.map(video => {
-            if (video.paused && video.readyState > 2) {
-              return video.play();
-            }
-          }));
-        } catch (error) {
-          console.log('Reintentando reproducción...');
-          setTimeout(playAllVideos, 500);
-        }
-      };
+      // Manejo mejorado de reproducción de videos
+      document.addEventListener('DOMContentLoaded', () => {
+        const videos = Array.from(document.querySelectorAll('video'));
+        
+//         const playAllVideos = async () => {
+//   try {
+//     await Promise.all(videos.map(video => {
+//       if (video.paused) {
+//         return video.play();
+//       }
+//     }));
+//   } catch (error) {
+//     console.log('Reintentando reproducción...');
+//     // setTimeout(playAllVideos, 500);
+//   }
+// };
 
-      document.addEventListener('touchstart', playAllVideos, { once: true });
-      document.addEventListener('click', playAllVideos, { once: true });
-    });
-  </script>
+
+        // document.addEventListener('touchstart', playAllVideos, { once: true });
+        // document.addEventListener('click', playAllVideos, { once: true });
+      });
+    </script>
   </head>
   <body>
     <a-scene mindar-image="imageTargetSrc: assets/targets-panel.mind;" 
