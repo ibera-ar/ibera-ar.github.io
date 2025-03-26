@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
    
     <style>      
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
              vr-mode-ui="enabled: false" 
              device-orientation-permission-ui="enabled: true"
             
-             renderer="antialias: false; precision: medium; highRefreshRate: true" 
+             renderer="antialias: false; precision: medium; highRefreshRate: false" 
              id="ar-scene"
              loaded="console.log('Escena y assets cargados')">
       
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-console.log('Ibera-AR version 0.9.1');
+console.log('Ibera-AR version 0.9.2');
   </script> 
   </body>
 </html>
