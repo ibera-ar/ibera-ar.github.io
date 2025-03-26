@@ -164,5 +164,91 @@
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
     </a-scene>
+    <script>
+  
+    // let isPlaying = false;
+    // let activeAudio = null;
+  
+    // const soundButton = document.getElementById('sound-button');
+  
+    // const audios = {
+    //   0: document.getElementById('audio-0'),
+    //   1: document.getElementById('audio-1'),
+    //   2: document.getElementById('audio-2'),
+    //   3: document.getElementById('audio-3'),
+    //   4: document.getElementById('audio-4'),
+    //   5: document.getElementById('audio-5'),
+    //   6: document.getElementById('audio-6'),
+    //   7: document.getElementById('audio-7'),
+    //   8: document.getElementById('audio-8'),
+    //   9: document.getElementById('audio-9'),
+    // };
+  
+  
+  
+  function playAnimation(targetEl) {
+  const modelEl = targetEl.querySelector('[gltf-model]');
+  if (modelEl) {
+  console.log('Set animation mixer att:', targetEl.id);
+  modelEl.setAttribute('animation-mixer', "clip: *; loop: repeat");
+  }
+  }
+  
+  
+  // // Función para detener la animación (opcionalmente se puede remover el componente).
+  // Aquí se remueve el componente para detenerla.
+  function stopAnimation(targetEl) {
+  const modelEl = targetEl.querySelector('[gltf-model]');
+  if (modelEl) {
+    console.log('Remove animation mixer att:', targetEl.id);
+  
+    modelEl.removeAttribute('animation-mixer');
+  }
+  }
+  
+  
+    function initTargetListeners(targetEl) {
+      targetEl.addEventListener('targetFound', () => {
+        console.log('Target found:', targetEl.id);
+        // const idx = targetEl.getAttribute('data-index');
+        // if (activeAudio && isPlaying) {
+        //   activeAudio.pause();
+        //   isPlaying = false;
+        // }
+        // activeAudio = audios[idx];
+        // soundButton.style.display = 'flex';
+  
+        //   // Llama a la función para reproducir la animación
+        //   playAnimation(targetEl);
+      });
+  
+      targetEl.addEventListener('targetLost', () => {
+        console.log('Target lost:', targetEl.id);
+        // if (activeAudio && isPlaying) {
+        //   activeAudio.pause();
+        //   isPlaying = false;
+        // }
+        // soundButton.style.display = 'none';
+  
+          // Llama a la función para detener la animación
+          // stopAnimation(targetEl);
+      });
+    }
+  
+    const targets = document.querySelectorAll('[mindar-image-target]');
+    targets.forEach((targetEl) => {
+      initTargetListeners(targetEl);
+    });
+  
+    // function toggleSound() {
+    //   if (!activeAudio) return;
+    //   if (isPlaying) {
+    //     activeAudio.pause();
+    //   } else {
+    //     activeAudio.play();
+    //   }
+    //   isPlaying = !isPlaying;
+    // }
+  </script> 
   </body>
 </html>
