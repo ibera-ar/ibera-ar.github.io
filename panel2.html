@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script>
+        // Componente para optimizar videos
+        AFRAME.registerComponent('optimized-video', {
+            schema: {
+                targetIndex: { type: 'number', default: 0 }
+            },
+
+            init: function () {
+                const video = document.getElementById(`video${this.data.targetIndex}`);
+                const texture = new THREE.VideoTexture(video);
+
+                texture.minFilter = THREE.NearestFilter;
+                texture.magFilter = THREE.NearestFilter;
+                texture.format = THREE.RGBFormat;
+
+                const material = new THREE.MeshBasicMaterial({
+                    map: texture,
+                    transparent: true,
+                    blending: THREE.NormalBlending
+                });
+
+                this.el.getObject3D('mesh').material = material;
+            }
+        });
+
+    // Manejo mejorado de reproducción de videos
+    document.addEventListener('DOMContentLoaded', () => {
+        const videos = Array.from(document.querySelectorAll('video'));
+        
+        const playAllVideos = async () => {
+          try {
+            await Promise.all(videos.map(video => video.play()));
+          } catch (error) {
+            console.log('Reintentando reproducción...');
+            setTimeout(playAllVideos, 500);
+          }
+        };
+
+        document.addEventListener('touchstart', playAllVideos, { once: true });
+        document.addEventListener('click', playAllVideos, { once: true });
+      });
+    </script>
+</head>
+<body>
+    <a-scene 
+        mindar-image="imageTargetSrc: assets/targets-panel.mind; maxTrack: 1"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: true"
+        renderer="antialias: false; highRefreshRate: false"
+    >
+        <a-assets>
+            <video id="video0" preload="auto" loop playsinline muted src="assets/aguaraguazu.webm"></video>
+            <video id="video1" preload="auto" loop playsinline muted src="assets/chuna.webm"></video>
+            <video id="video2" preload="auto" loop playsinline muted src="assets/guacamayo.webm"></video>
+            <video id="video3" preload="auto" loop playsinline muted src="assets/muitu.webm"></video>
+            <video id="video4" preload="auto" loop playsinline muted src="assets/nutria.webm"></video>
+            <video id="video5" preload="auto" loop playsinline muted src="assets/ocelote.webm"></video>
+            <video id="video6" preload="auto" loop playsinline muted src="assets/tamandua.webm"></video>
+            <video id="video7" preload="auto" loop playsinline muted src="assets/venado.webm"></video>
+            <video id="video8" preload="auto" loop playsinline muted src="assets/yaguarete.webm"></video>
+        </a-assets>
+
+        <!-- Targets (0-8) -->
+        <a-entity mindar-image-target="targetIndex: 0">
+            <a-plane width="1.5" height="1.2" position="0 0 0" optimized-video="targetIndex: 0"></a-plane>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 1">
+            <a-plane width="1.5" height="1.2" position="0 0 0" optimized-video="targetIndex: 1"></a-plane>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 2">
+            <a-plane width="1.5" height="1.2" position="0 0 0" optimized-video="targetIndex: 2"></a-plane>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 3">
+            <a-plane width="1.5" height="1.2" position="0 0 0" optimized-video="targetIndex: 3"></a-plane>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 4">
+            <a-plane width="1.5" height="1.2" position="0 0 0" optimized-video="targetIndex: 4"></a-plane>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 5">
+            <a-plane width="1.5" height="1.2" position="0 0 0" optimized-video="targetIndex: 5"></a-plane>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 6">
+            <a-plane width="1.5" height="1.2" position="0 0 0" optimized-video="targetIndex: 6"></a-plane>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 7">
+            <a-plane width="1.5" height="1.2" position="0 0 0" optimized-video="targetIndex: 7"></a-plane>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 8">
+            <a-plane width="1.5" height="1.2" position="0 0 0" optimized-video="targetIndex: 8"></a-plane>
+        </a-entity>
+
+        <a-camera position="0 0 0" look-controls="enabled: true"></a-camera>
+    </a-scene>
+</body>
+</html>

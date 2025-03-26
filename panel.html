@@ -194,6 +194,12 @@
       initTargetListeners(targetEl);
     });
 
+
+
+    video.addEventListener('error', (e) => {
+  console.error('Error en video:', e.target.error);
+});
+
   </script> 
   </body>
 </html>
