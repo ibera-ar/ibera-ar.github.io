@@ -17,6 +17,8 @@
         const videoId = `video${this.data.targetIndex}`;
         const video = document.getElementById(videoId);
 
+        const renderer = document.querySelector('a-scene').renderer;
+    renderer.extensions.get('OES_texture_float_linear');
         if (!video) {
           console.error(`[Shader] Video ${videoId} no encontrado`);
           return;
@@ -41,13 +43,15 @@
               }
             `,
             fragmentShader: `
+            precision mediump float;
               uniform sampler2D baseTexture;
               uniform float threshold;
               varying vec2 vUv;
               
               void main() {
                 vec4 color = texture2D(baseTexture, vUv);
-                float luminance = (color.r + color.g + color.b) * 0.333;
+                // float luminance = (color.r + color.g + color.b) * 0.333;
+                  float luminance = dot(color.rgb, vec3(0.299, 0.587, 0.114));
                 gl_FragColor = vec4(color.rgb, step(threshold, luminance));
               }
             `,
@@ -86,16 +90,19 @@
         }
       };
 
-      document.addEventListener('touchstart', playAllVideos, { once: true });
-      document.addEventListener('click', playAllVideos, { once: true });
+      // document.addEventListener('touchstart', playAllVideos, { once: true });
+      // document.addEventListener('click', playAllVideos, { once: true });
     });
+
   </script>
   </head>
   <body>
+    <!-- renderer="antialias: false; highRefreshRate: true" -->
     <a-scene mindar-image="imageTargetSrc: assets/targets-panel.mind;" 
              vr-mode-ui="enabled: false" 
              device-orientation-permission-ui="enabled: true"
-             renderer="antialias: false; highRefreshRate: true"
+            
+             renderer="antialias: true; highRefreshRate: false; precision: mediump"
              id="ar-scene"
              loaded="console.log('Escena y assets cargados')">
       
