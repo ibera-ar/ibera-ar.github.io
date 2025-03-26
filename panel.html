@@ -4,11 +4,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <!-- Polyfill para navegadores muy antiguos -->
-<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
-    <style>      .a-enter-vr-button {
+   
+    <style>      
+    .a-enter-vr-button {
       display: none; 
-    }</style>
+    }
+    </style>
 
 <script>  AFRAME.registerComponent('additive-shader', {
   schema: { 
@@ -29,11 +30,11 @@ renderer.extensions.get('OES_texture_float_linear');
     const floatLinearExt = renderer.extensions.get('OES_texture_float_linear');
 if (!floatLinearExt) console.warn("Floating point textures not supported");
 
-            // 1. Forzar actualización de textura en móvil
-            let texture = null;
-            const updateTexture = () => {
-            if (texture) texture.needsUpdate = true;
-                };
+            // // 1. Forzar actualización de textura en móvil
+            // let texture = null;
+            // const updateTexture = () => {
+            // if (texture) texture.needsUpdate = true;
+            //     };
 
     const createMaterial = () => {
       const texture = new THREE.VideoTexture(video);
