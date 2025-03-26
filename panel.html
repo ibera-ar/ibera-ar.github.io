@@ -7,94 +7,101 @@
     <style>      .a-enter-vr-button {
       display: none; 
     }</style>
-  <script>
-    AFRAME.registerComponent('additive-shader', {
-      schema: { 
-        targetIndex: { type: 'number', default: 0 }
-      },
 
-      init: function () {
-        const videoId = `video${this.data.targetIndex}`;
-        const video = document.getElementById(videoId);
+<script>  AFRAME.registerComponent('additive-shader', {
+  schema: { 
+    targetIndex: { type: 'number', default: 0 }
+  },
 
-        const renderer = document.querySelector('a-scene').renderer;
-    renderer.extensions.get('OES_texture_float_linear');
-        if (!video) {
-          console.error(`[Shader] Video ${videoId} no encontrado`);
-          return;
+  init: function () {
+    const videoId = `video${this.data.targetIndex}`;
+    const video = document.getElementById(videoId);
+
+    const renderer = document.querySelector('a-scene').renderer;
+renderer.extensions.get('OES_texture_float_linear');
+    if (!video) {
+      console.error(`[Shader] Video ${videoId} no encontrado`);
+      return;
+    }
+
+            // 1. Forzar actualización de textura en móvil
+            let texture = null;
+            const updateTexture = () => {
+            if (texture) texture.needsUpdate = true;
+                };
+
+    const createMaterial = () => {
+      const texture = new THREE.VideoTexture(video);
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      texture.format = THREE.RGBAFormat;
+
+      const material = new THREE.ShaderMaterial({
+        uniforms: {
+          baseTexture: { value: texture },
+          threshold: { value: 0.2 }
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          precision mediump float;
+          uniform sampler2D baseTexture;
+          uniform float threshold;
+          varying vec2 vUv;
+          
+          void main() {
+            vec4 color = texture2D(baseTexture, vUv);
+            // Cálculo optimizado para móvil
+            float luminance = color.g * 0.8 + (color.r + color.b) * 0.1;
+            float alpha = step(threshold, luminance);
+            gl_FragColor = vec4(color.rgb * alpha, alpha);
+          }
+        `,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthTest: false
+      });
+
+      this.el.getObject3D('mesh').material = material;
+    };
+
+    if (video.readyState >= video.HAVE_CURRENT_DATA) {
+      createMaterial();
+    } else {
+      video.addEventListener('loadeddata', createMaterial);
+      video.addEventListener('error', (e) => {
+        console.error(`[Video ${videoId}] Error:`, e.target.error);
+      });
+    }
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const videos = Array.from(document.querySelectorAll('video'));
+  
+  const playAllVideos = async () => {
+    try {
+      await Promise.all(videos.map(video => {
+        if (video.paused && video.readyState > 2) {
+          return video.play();
         }
+      }));
+    } catch (error) {
+      console.log('Reintentando reproducción...');
+      setTimeout(playAllVideos, 500);
+    }
+  };
 
-        const createMaterial = () => {
-          const texture = new THREE.VideoTexture(video);
-          texture.minFilter = THREE.LinearFilter;
-          texture.magFilter = THREE.LinearFilter;
-          texture.format = THREE.RGBAFormat;
+  // document.addEventListener('touchstart', playAllVideos, { once: true });
+  // document.addEventListener('click', playAllVideos, { once: true });
+});</script>
 
-          const material = new THREE.ShaderMaterial({
-            uniforms: {
-              baseTexture: { value: texture },
-              threshold: { value: 0.2 }
-            },
-            vertexShader: `
-              varying vec2 vUv;
-              void main() {
-                vUv = uv;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-              }
-            `,
-            fragmentShader: `
-            precision mediump float;
-              uniform sampler2D baseTexture;
-              uniform float threshold;
-              varying vec2 vUv;
-              
-              void main() {
-                vec4 color = texture2D(baseTexture, vUv);
-                // float luminance = (color.r + color.g + color.b) * 0.333;
-                  float luminance = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-                gl_FragColor = vec4(color.rgb, step(threshold, luminance));
-              }
-            `,
-            transparent: true,
-            blending: THREE.AdditiveBlending,
-            depthTest: false
-          });
 
-          this.el.getObject3D('mesh').material = material;
-        };
-
-        if (video.readyState >= video.HAVE_CURRENT_DATA) {
-          createMaterial();
-        } else {
-          video.addEventListener('loadeddata', createMaterial);
-          video.addEventListener('error', (e) => {
-            console.error(`[Video ${videoId}] Error:`, e.target.error);
-          });
-        }
-      }
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const videos = Array.from(document.querySelectorAll('video'));
-      
-      const playAllVideos = async () => {
-        try {
-          await Promise.all(videos.map(video => {
-            if (video.paused && video.readyState > 2) {
-              return video.play();
-            }
-          }));
-        } catch (error) {
-          console.log('Reintentando reproducción...');
-          setTimeout(playAllVideos, 500);
-        }
-      };
-
-      // document.addEventListener('touchstart', playAllVideos, { once: true });
-      // document.addEventListener('click', playAllVideos, { once: true });
-    });
-
-  </script>
   </head>
   <body>
     <!-- renderer="antialias: false; highRefreshRate: true" -->
@@ -109,22 +116,41 @@
       <a-assets>
         <!-- Videos optimizados (720p y VP9) -->
         <video id="video0" preload="auto" autoplay loop playsinline muted 
+        webkit-playsinline="true" 
+        x5-video-player-type="h5"
+        x5-video-orientation="portrait"
               src="assets/aguaraguazu.webm"  crossorigin="anonymous"></video>
-        <video id="video1" preload="auto" autoplay loop playsinline muted 
+        <video id="video1" preload="auto" autoplay loop playsinline muted      webkit-playsinline="true" 
+        x5-video-player-type="h5"
+        x5-video-orientation="portrait"
               src="assets/chuna.webm"  crossorigin="anonymous"></video>
-        <video id="video2" preload="auto" autoplay loop playsinline muted 
+        <video id="video2" preload="auto" autoplay loop playsinline muted      webkit-playsinline="true" 
+        x5-video-player-type="h5"
+        x5-video-orientation="portrait"
               src="assets/guacamayo.webm"  crossorigin="anonymous"></video>
-        <video id="video3" preload="auto" autoplay loop playsinline muted 
+        <video id="video3" preload="auto" autoplay loop playsinline muted      webkit-playsinline="true" 
+        x5-video-player-type="h5"
+        x5-video-orientation="portrait"
               src="assets/muitu.webm"  crossorigin="anonymous"></video>
-        <video id="video4" preload="auto" autoplay loop playsinline muted 
+        <video id="video4" preload="auto" autoplay loop playsinline muted      webkit-playsinline="true" 
+        x5-video-player-type="h5"
+        x5-video-orientation="portrait"
               src="assets/nutria.webm"  crossorigin="anonymous"></video>
-        <video id="video5" preload="auto" autoplay loop playsinline muted 
+        <video id="video5" preload="auto" autoplay loop playsinline muted      webkit-playsinline="true" 
+        x5-video-player-type="h5"
+        x5-video-orientation="portrait"
               src="assets/ocelote.webm"  crossorigin="anonymous"></video>
-        <video id="video6" preload="auto" autoplay loop playsinline muted 
+        <video id="video6" preload="auto" autoplay loop playsinline muted      webkit-playsinline="true" 
+        x5-video-player-type="h5"
+        x5-video-orientation="portrait"
               src="assets/tamandua.webm"  crossorigin="anonymous"></video>
-        <video id="video7" preload="auto" autoplay loop playsinline muted 
+        <video id="video7" preload="auto" autoplay loop playsinline muted      webkit-playsinline="true" 
+        x5-video-player-type="h5"
+        x5-video-orientation="portrait"
               src="assets/venado.webm"  crossorigin="anonymous"></video>
-        <video id="video8" preload="auto" autoplay loop playsinline muted 
+        <video id="video8" preload="auto" autoplay loop playsinline muted      webkit-playsinline="true" 
+        x5-video-player-type="h5"
+        x5-video-orientation="portrait"
               src="assets/yaguarete.webm" crossorigin="anonymous"></video>
       </a-assets>
 
