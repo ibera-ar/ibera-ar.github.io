@@ -30,7 +30,7 @@
   </head>
   <body>
     <!-- control de sonido -->
-    <button id="sound-button" onclick="toggleSound()">♬</button>
+    <button id="sound-button" onclick="toggleSound()">🔊</button>
     <a-scene 
       mindar-image="imageTargetSrc: assets/targets.mind;" 
       vr-mode-ui="enabled: false" 
@@ -216,12 +216,12 @@
   let isPlaying = false;
   let activeAudio = null;
   const soundButton = document.getElementById('sound-button');
-  const audios = { /* ... */ };
+  const audios = Array.from({length: 16}, (_, i) => document.getElementById(`audio-${i}`));
 
   // Nueva función para manejar carga de modelos
   function onModelLoaded(evt) {
     console.log('Model loaded:', evt.target.id);
-    // Aquí podríamos activar animaciones solo cuando el modelo está listo
+    // activar animaciones solo cuando el modelo está listo
   }
 
   function playAnimation(targetEl) {
@@ -255,7 +255,7 @@ document.querySelector('a-scene').addEventListener('loaded', () => {
 
 
   // Función para detener la animación (opcionalmente se puede remover el componente).
-  // Aquí se remueve el componente para detenerla.
+  // Aquí se remueve el componente para detenerla. A lo bruto
   function stopAnimation(targetEl) {
     const modelEl = targetEl.querySelector('[gltf-model]');
     if (modelEl) {
