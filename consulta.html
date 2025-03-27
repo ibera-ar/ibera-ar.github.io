@@ -58,8 +58,11 @@
 
       <!-- entidades para cada target -->      
       <!-- 0: aguaraguazu -->
+      <!-- rotation="0 -90 -45"  -->
+
       <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
-        <a-entity gltf-model="#model-0" scale="0.15 0.15 0.15" position="0 0 0" rotation="0 -90 -45" 
+        <a-entity gltf-model="#model-0" scale="0.15 0.15 0.15" position="0 0 0" 
+        rotation="0 -90 0" 
         animation-mixer
         custom-rotation="sensitivity: 0.2"        model-loaded="onModelLoaded"
         ></a-entity>
@@ -265,6 +268,28 @@ document.querySelector('a-scene').addEventListener('loaded', () => {
           this.touchStartX = e.touches[0].pageX;
         }
       });
+
+      // Detectar evento de mouse
+this.el.sceneEl.addEventListener('mousedown', (e) => {
+  if (e.button === 0) { // Botón izquierdo
+    this.touchStartX = e.pageX;
+    this.isDragging = true;
+  }
+});
+
+this.el.sceneEl.addEventListener('mousemove', (e) => {
+  if (this.isDragging) {
+    const deltaX = e.pageX - this.touchStartX;
+    this.rotationY += deltaX * this.data.sensitivity;
+    this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
+    this.touchStartX = e.pageX;
+  }
+});
+
+this.el.sceneEl.addEventListener('mouseup', () => {
+  this.isDragging = false;
+});
+
     }
   });
 </script>
