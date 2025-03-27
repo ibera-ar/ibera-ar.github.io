@@ -61,11 +61,10 @@
       <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
         <a-entity gltf-model="#model-0" scale="0.15 0.15 0.15" position="0 0 0" rotation="0 -90 -45" 
         animation-mixer
-        custom-rotation 
-        model-loaded="onModelLoaded"
+        custom-rotation="sensitivity: 0.2"        model-loaded="onModelLoaded"
         ></a-entity>
-        <a-box          custom-rotation 
-
+        <a-box            custom-rotation="sensitivity: 0.2"
+        scale="0.1 0.1 0.1" 
         position='0 0.5 0' material='opacity: 0.5;'></a-box>
       </a-entity>
 
@@ -195,7 +194,7 @@ document.querySelector('a-scene').addEventListener('loaded', () => {
       console.log('Ibera-AR version 0.2.1');
 
       </script> 
-      <script>
+      <!-- <script>
         AFRAME.registerComponent('custom-rotation', {
           init: function () {
             this.initialRotation = new THREE.Vector3();
@@ -236,6 +235,38 @@ document.querySelector('a-scene').addEventListener('loaded', () => {
             });
           }
         });
-      </script>
+      </script> -->
+
+
+<script>
+  AFRAME.registerComponent('custom-rotation', {
+    schema: {
+      sensitivity: { type: 'number', default: 0.2 } // Ajusta la sensibilidad
+    },
+    init: function () {
+      this.rotationY = 0;
+      this.touchStartX = 0;
+
+      this.el.sceneEl.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          this.touchStartX = e.touches[0].pageX;
+        }
+      });
+
+      this.el.sceneEl.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1) {
+          const deltaX = e.touches[0].pageX - this.touchStartX;
+          this.rotationY += deltaX * this.data.sensitivity;
+          
+          // Aplicar rotación solo en el eje Y
+          this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
+          
+          // Actualizar posición inicial para el próximo movimiento
+          this.touchStartX = e.touches[0].pageX;
+        }
+      });
+    }
+  });
+</script>
   </body>
 </html>
