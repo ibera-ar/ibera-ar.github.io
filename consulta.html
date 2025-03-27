@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+        <style>
+      #sound-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        background: white;
+        border: 2px solid #ccc;
+        border-radius: 30px;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: none;
+      }
+      .a-enter-vr-button {
+  display: none; 
+}
+    </style>
+  </head>
+  <body>
+    <!-- control de sonido -->
+    <button id="sound-button" onclick="toggleSound()">🔊</button>
+    <a-scene 
+      mindar-image="imageTargetSrc: assets/targets.mind;" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: true"
+      id="ar-scene"
+      gesture-detector
+      xrextras-gesture-detector
+    >
+
+
+      <!-- assets para cada target -->
+        <!-- 0: aguaraguazu -->
+        <a-asset-item id="model-0" src="assets/aguaraguazu.glb" onload="console.log('Model 1 loaded')"></a-asset-item>
+        <audio id="audio-0" src="assets/aguaraguazu.mp3" loop></audio>
+    
+<!-- mas assets -->
+
+
+    <!-- Lights -->
+     <!-- <a-entity light="type: ambient; color: #ff0094; intensity: 1"></a-entity>  -->
+    <a-entity light="type: directional; color: #fff; intensity: 0.8" 
+    position="-0.5 1 1"
+    ></a-entity>
+    <!-- <a-entity cursor position="0 0 0"></a-entity>    -->
+
+
+      <!-- entidades para cada target -->      
+      <!-- 0: aguaraguazu -->
+      <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
+        <a-entity gltf-model="#model-0" scale="0.15 0.15 0.15" position="0 0 0" rotation="0 -90 -45" 
+        animation-mixer
+        gesture-detector 
+        model-loaded="onModelLoaded"
+        ></a-entity>
+        <a-box position='0 0.5 0' material='opacity: 0.5;'></a-box>
+      </a-entity>
+
+      <!-- mas targets -->
+
+      <a-camera id="camera" position="0 0 0" look-controls="enabled: false"></a-camera>
+    </a-scene>
+
+<script>
+
+  // Variables existentes
+  let isPlaying = false;
+  let activeAudio = null;
+  const soundButton = document.getElementById('sound-button');
+  const audios = Array.from({length: 16}, (_, i) => document.getElementById(`audio-${i}`));
+
+  // Nueva función para manejar carga de modelos
+  function onModelLoaded(evt) {
+    console.log('Model loaded:', evt.target.id);
+    // activar animaciones solo cuando el modelo está listo
+  }
+
+  function playAnimation(targetEl) {
+    const modelEl = targetEl.querySelector('[gltf-model]');
+    if (modelEl && modelEl.components['gltf-model']?.data) {
+      // Verificamos que el modelo esté realmente cargado
+      modelEl.setAttribute('animation-mixer', "clip: *; loop: repeat");
+  
+    // Añadir listener para rotación
+    modelEl.addEventListener('twist', (e) => {
+      // Ajustar rotación en el eje Y (horizontal)
+      modelEl.object3D.rotation.y += e.detail.rotation;
+    });
+    } else {
+      // Si no está cargado, esperamos al evento
+      modelEl.addEventListener('model-loaded', () => {
+
+        modelEl.setAttribute('animation-mixer', "clip: *; loop: repeat");
+
+      // Añadir listener después de cargar el modelo
+        modelEl.addEventListener('twist', (e) => {
+        modelEl.object3D.rotation.y += e.detail.rotation;
+      });
+    });
+    }
+  }
+
+// inicialización dentro del evento 'loaded' de A-Frame
+document.querySelector('a-scene').addEventListener('loaded', () => {
+        const targets = document.querySelectorAll('[mindar-image-target]');
+        targets.forEach((targetEl) => {
+          initTargetListeners(targetEl);
+        });
+      });
+
+
+  // Función para detener la animación (opcionalmente se puede remover el componente).
+  // Aquí se remueve el componente para detenerla. A lo bruto
+  function stopAnimation(targetEl) {
+    const modelEl = targetEl.querySelector('[gltf-model]');
+    if (modelEl) {
+      console.log('Remove animation mixer att:', targetEl.id);
+
+      modelEl.removeAttribute('animation-mixer');
+    }
+  }
+
+      function initTargetListeners(targetEl) {
+        targetEl.addEventListener('targetFound', () => {
+          console.log('Target found:', targetEl.id);
+          const idx = targetEl.getAttribute('data-index');
+          if (activeAudio && isPlaying) {
+            activeAudio.pause();
+            isPlaying = false;
+          }
+          activeAudio = audios[idx];
+          soundButton.style.display = 'flex';
+
+            // Llama a la función para reproducir la animación
+            playAnimation(targetEl);
+        });
+
+        targetEl.addEventListener('targetLost', () => {
+          console.log('Target lost:', targetEl.id);
+          if (activeAudio && isPlaying) {
+            activeAudio.pause();
+            isPlaying = false;
+          }
+          soundButton.style.display = 'none';
+
+            // Llama a la función para detener la animación
+            stopAnimation(targetEl);
+        });
+      }
+
+      const targets = document.querySelectorAll('[mindar-image-target]');
+      targets.forEach((targetEl) => {
+        initTargetListeners(targetEl);
+      });
+
+      function toggleSound() {
+        if (!activeAudio) return;
+        if (isPlaying) {
+          activeAudio.pause();
+        } else {
+          activeAudio.play();
+        }
+        isPlaying = !isPlaying;
+      }
+
+      console.log('Ibera-AR version 0.2.0');
+
+      </script> 
+  </body>
+</html>
