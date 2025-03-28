@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>  <style>
+      #sound-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        background: white;
+        border: 2px solid #ccc;
+        border-radius: 30px;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: none;
+      }
+      .a-enter-vr-button {
+  display: none; 
+}
+    </style>
+  </head>
+  <body>
+    <!-- control de sonido -->
+    <button id="sound-button" onclick="toggleSound()">🔊</button>
+    <a-scene 
+      mindar-image="imageTargetSrc: assets/targets.mind;" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: true"
+      id="ar-scene"
+
+    >
+
+
+      <!-- assets para cada target -->
+        <!-- 0: aguaraguazu -->
+        <a-asset-item id="model-0" src="assets/aguaraguazu.glb" onload="console.log('Model 1 loaded')"></a-asset-item>
+        <a-asset-item id="model-1" src="/BoxAnimated.glb" onload="console.log('AnimatedMorphCube loaded')"></a-asset-item>
+
+        <audio id="audio-0" src="assets/aguaraguazu.mp3" loop></audio>
+    
+<!-- mas assets -->
+
+
+    <!-- Lights -->
+     <!-- <a-entity light="type: ambient; color: #ff0094; intensity: 1"></a-entity>  -->
+    <a-entity light="type: directional; color: #fff; intensity: 0.8" 
+    position="-0.5 1 1"
+    ></a-entity>
+    <!-- <a-entity cursor position="0 0 0"></a-entity>    -->
+
+
+      <!-- entidades para cada target -->      
+      <!-- 0: aguaraguazu -->
+      <!-- rotation="0 -90 -45"  -->
+
+      <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
+        <a-entity gltf-model="#model-0" scale="0.15 0.15 0.15" position="0 0 0" 
+        rotation="0 -90 0" 
+        animation-mixer
+        custom-rotation="sensitivity: 0.2"  
+        light="type: directional;
+
+        intensity: 0.8;
+
+        castShadow: true;
+
+        shadowMapHeight:2048;
+
+        shadowMapWidth:2048;
+
+        shadowCameraTop: 10;
+"      
+        ></a-entity>
+        <!-- <a-box            custom-rotation="sensitivity: 0.2"
+        scale="0.1 0.1 0.1" 
+        position='0 0.5 0' material='opacity: 0.5;'></a-box> -->
+      </a-entity>
+
+
+      <a-entity mindar-image-target="targetIndex: 1" data-index="1" id="target-1">
+        <a-entity gltf-model="#model-1" scale="0.15 0.15 0.15" position="0 0 0" 
+        rotation="0 -90 0" 
+        animation-mixer
+        custom-rotation="sensitivity: 0.2"   
+        light="type: directional;
+
+        intensity: 0.8;
+
+        castShadow: true;
+
+        shadowMapHeight:1024;
+
+        shadowMapWidth:2048;
+
+        shadowCameraTop: 10;
+"
+        ></a-entity>
+      </a-entity>
+      <!-- mas targets -->
+
+      <a-camera id="camera" position="0 0 0" look-controls="enabled: false"></a-camera>
+    </a-scene>
+
+<script>
+
+  // Variables existentes
+  let isPlaying = false;
+  let activeAudio = null;
+  const soundButton = document.getElementById('sound-button');
+  const audios = Array.from({length: 16}, (_, i) => document.getElementById(`audio-${i}`));
+
+  // PLAY ANIMATION
+  function playAnimation(targetEl) {
+    console.log('playAnimation FUNCTION');
+    console.log('Estructura del target:', targetEl);
+    console.log('Elementos con gltf-model:', targetEl.querySelectorAll('[gltf-model]'));
+    
+    const modelEl = targetEl.querySelector('[gltf-model]');
+    console.log('Estructura del modelo:', modelEl.object3D);
+    console.log('Esqueleto encontrado:', modelEl.object3D.traverse(obj => {
+        if (obj.isBone) console.log('Hueso:', obj.name);
+        }));
+
+    if (!modelEl) {
+    console.error('⚠️ Modelo no encontrado en el target:', targetEl.id);
+    return;
+    }
+
+    const setupAnimation = () => {
+    const modelData = modelEl.components['gltf-model'];
+
+    // Obtener animaciones directamente del modelo
+    const animations = modelData.model.animations;
+    // Mostrar nombres de animaciones
+    console.log('_Animaciones detectadas:', animations.map(a => a.name));
+
+// Configurar animación
+    const animationName = animations[0].name;
+    console.log('Animaciones a asignar:', animationName);
+    modelEl.setAttribute('animation-mixer', {
+      clip: animationName,
+      loop: true,
+      timeScale: 1,
+      crossFadeDuration: 0
+  });
+  console.log('se supone que asigno:', animationName);
+
+  setTimeout(() => {
+      const mixerComponent = modelEl.components['animation-mixer'];
+      if (mixerComponent?.mixer) {
+        const clip = animations[0];
+        const action = mixerComponent.mixer.clipAction(clip);
+        action.loop = THREE.LoopRepeat;
+        action.play();
+        console.log('▶️ Reproduciendo:', animationName);
+      }
+    }, 200);
+
+
+  };
+
+  // Verificar carga del modelo
+  if (modelEl.hasLoaded) {
+    console.log('modelo cargado');
+
+    setupAnimation();
+  } else {
+    console.log('modelo no cargado');
+
+    modelEl.addEventListener('model-loaded', setupAnimation, { once: true });
+  }
+}
+
+  // STOP ANIMATION
+  // Aquí se remueve el componente para detenerla. A lo bruto
+  function stopAnimation(targetEl) {
+    const modelEl = targetEl.querySelector('[gltf-model]');
+    if (modelEl) {
+      console.log('Remove animation mixer att:', targetEl.id);
+
+      modelEl.removeAttribute('animation-mixer');
+    }
+  }
+
+
+
+
+// inicialización principal
+document.querySelector('a-scene').addEventListener('loaded', () => {
+  console.log('inicialización principal');
+
+        const targets = document.querySelectorAll('[mindar-image-target]');
+        targets.forEach((targetEl) => {
+          initTargetListeners(targetEl);
+        });
+      });
+
+
+
+
+  function initTargetListeners(targetEl) {
+    console.log('initTargetListeners FUNCTION');
+
+        targetEl.addEventListener('targetFound', () => {
+          console.log('Target found:', targetEl.id);
+          const idx = targetEl.getAttribute('data-index');
+          if (activeAudio && isPlaying) {
+            activeAudio.pause();
+            isPlaying = false;
+          }
+          activeAudio = audios[idx];
+          soundButton.style.display = 'flex';
+
+            // Llama a la función para reproducir la animación
+            playAnimation(targetEl);
+        });
+
+        targetEl.addEventListener('targetLost', () => {
+          console.log('Target lost:', targetEl.id);
+          if (activeAudio && isPlaying) {
+            activeAudio.pause();
+            isPlaying = false;
+          }
+          soundButton.style.display = 'none';
+
+            // Llama a la función para detener la animación
+            stopAnimation(targetEl);
+        });
+      }
+
+
+
+      function toggleSound() {
+        if (!activeAudio) return;
+        if (isPlaying) {
+          activeAudio.pause();
+        } else {
+          activeAudio.play();
+        }
+        isPlaying = !isPlaying;
+      }
+
+
+
+
+
+        // Forzar modo WebGL2 para mejor compatibilidad
+  AFRAME.registerComponent('force-webgl2', {
+    init: function () {
+      if (this.el.sceneEl.renderer && this.el.sceneEl.renderer.capabilities.isWebGL2) {
+        this.el.sceneEl.renderer.outputEncoding = THREE.sRGBEncoding;
+      }
+    }
+  });
+  // Aplicar a la escena
+  document.querySelector('a-scene').setAttribute('force-webgl2', '');
+
+      console.log('Ibera-AR version 0.2.2');
+
+      </script> 
+
+
+ <script>
+  AFRAME.registerComponent('custom-rotation', {
+    schema: {
+      sensitivity: { type: 'number', default: 0.2 } // Ajusta la sensibilidad
+    },
+    init: function () {
+      this.rotationY = 0;
+      this.touchStartX = 0;
+
+      this.el.sceneEl.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          this.touchStartX = e.touches[0].pageX;
+        }
+      });
+
+      this.el.sceneEl.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1) {
+          const deltaX = e.touches[0].pageX - this.touchStartX;
+          this.rotationY += deltaX * this.data.sensitivity;
+          
+          // Aplicar rotación solo en el eje Y
+          this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
+          
+          // Actualizar posición inicial para el próximo movimiento
+          this.touchStartX = e.touches[0].pageX;
+        }
+      });
+
+      // Detectar evento de mouse
+this.el.sceneEl.addEventListener('mousedown', (e) => {
+  if (e.button === 0) { // Botón izquierdo
+    this.touchStartX = e.pageX;
+    this.isDragging = true;
+  }
+});
+
+this.el.sceneEl.addEventListener('mousemove', (e) => {
+  if (this.isDragging) {
+    const deltaX = e.pageX - this.touchStartX;
+    this.rotationY += deltaX * this.data.sensitivity;
+    this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
+    this.touchStartX = e.pageX;
+  }
+});
+
+this.el.sceneEl.addEventListener('mouseup', () => {
+  this.isDragging = false;
+});
+
+    }
+  });
+</script> 
+  </body>
+</html>
