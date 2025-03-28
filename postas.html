@@ -23,13 +23,51 @@
         display: none;
       }
       .a-enter-vr-button {
-  display: none; 
+        display: none; 
+      }
+.hint-container {
+    position: fixed;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  .hint-icon {
+    width: 64px;
+    height: 64px;
+    animation: pulse 1.5s infinite;
+    /* animation: rotate 2s linear infinite; */
+
+  }
+  @keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  /* Efecto de fade */
+  .hint-visible {
+    opacity: 1 !important;
+  }
     </style>
   </head>
   <body>
+    <!-- Interfaz -->
     <!-- control de sonido -->
     <button id="sound-button" onclick="toggleSound()">🔊</button>
+    <!-- indicador de rotacion -->
+    <div id="rotation-hint" class="hint-container">
+      <img src="rotation.png" alt="Rotation" class="hint-icon">
+    </div>
+
     <a-scene 
       mindar-image="imageTargetSrc: assets/targets.mind;" 
       vr-mode-ui="enabled: false" 
@@ -276,6 +314,7 @@
   let activeAudio = null;
   const soundButton = document.getElementById('sound-button');
   const audios = Array.from({length: 16}, (_, i) => document.getElementById(`audio-${i}`));
+  const hint = document.getElementById('rotation-hint');
 
   // PLAY ANIMATION
   function playAnimation(targetEl) {
@@ -365,6 +404,7 @@ document.querySelector('a-scene').addEventListener('loaded', () => {
 
 
 
+    
 
   function initTargetListeners(targetEl) {
     console.log('initTargetListeners FUNCTION');
@@ -372,28 +412,46 @@ document.querySelector('a-scene').addEventListener('loaded', () => {
         targetEl.addEventListener('targetFound', () => {
           console.log('Target found:', targetEl.id);
           const idx = targetEl.getAttribute('data-index');
+
+    // Mostrar indicador con transición suave
+    hint.style.display = 'block';
+    hint.classList.add('hint-visible');
+    // Limpiar cualquier timer previo
+    clearTimeout(hint.timeout);
+
           if (activeAudio && isPlaying) {
             activeAudio.pause();
             isPlaying = false;
           }
           activeAudio = audios[idx];
           soundButton.style.display = 'flex';
+            // Mostrar indicador con fade
+            // console.log('mostrando indicador de rotacion');
+            // hint.style.display = 'block';
 
             // Llama a la función para reproducir la animación
             playAnimation(targetEl);
+
         });
 
         targetEl.addEventListener('targetLost', () => {
           console.log('Target lost:', targetEl.id);
+
+          // Ocultar indicador con transición
+    hint.classList.remove('hint-visible');
+    hint.timeout = setTimeout(() => {
+      hint.style.display = 'none';
+    }, 300); // Duración de la transición
+
           if (activeAudio && isPlaying) {
             activeAudio.pause();
             isPlaying = false;
           }
           soundButton.style.display = 'none';
 
-            // Llama a la función para detener la animación
             stopAnimation(targetEl);
-        });
+
+          });
       }
 
 
