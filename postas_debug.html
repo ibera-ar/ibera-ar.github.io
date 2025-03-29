@@ -56,26 +56,27 @@
           opacity: 1 !important;
         }
 
+        .debug-panel{
+          position: fixed;
+          top: 10px;
+          left: 10px;
+          background: rgba(0,0,0,0.7);
+          color: white;
+          padding: 10px;
+          border-radius: 8px;
+          font-family: monospace;
+          z-index: 9999;
+        }
     </style>
   </head>
   <body>
     <!-- Interfaz -->
-  <div id="debug-panel" style="
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  background: rgba(0,0,0,0.7);
-  color: white;
-  padding: 10px;
-  border-radius: 8px;
-  font-family: monospace;
-  z-index: 9999;
-">
-  <!-- <div>Modelos cargados: <span id="loaded-count">0</span>/16</div> -->
-  <div>FPS: <span id="fps">0</span></div>
-  <div>MEM: <span id="memory">0</span></div>
+      <!-- Debug panel -->
+      <div id="debug-panel" class="debug-panel">
+      <div>Modelos cargados: <span id="loaded-count">0</span>/16</div>
+      <div>FPS: <span id="fps">0</span></div>
+      <div>MEM: <span id="memory">0</span></div></div>
 
-</div>
     <!-- control de sonido -->
     <button id="sound-button" onclick="toggleSound()">🔊</button>
     <!-- indicador de rotacion -->
@@ -156,12 +157,12 @@
       </a-assets>
 
     <!-- Lights -->
-     <!-- <a-entity light="type: ambient; color: #ff0094; intensity: 1"></a-entity>  -->
-    <a-entity light="type: directional; color: #fff; intensity: 0.8" 
-    position="-0.5 1 1"
-    ></a-entity>
+     <!-- <a-entity light="type: directional; color: #ff0094; intensity: 1"></a-entity>  -->
+    <!-- <a-entity light="type: directional; color: #fff; intensity: 0.8" 
+    position="-0.5 1 1" castShadow: true
+    ></a-entity> -->
     <!-- <a-entity cursor position="0 0 0"></a-entity>    -->
-
+    <a-light type="ambient" color="#ffffff" intensity="0.3"></a-light>
       <!-- entidades para cada target -->      
       <!-- 0: aguaraguazu -->
       <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
@@ -170,6 +171,29 @@
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
         ></a-entity>
+         <!-- Luz Spot 1 (Izquierda) -->
+  <a-light 
+  type="spot" 
+  color="##ffcc00" 
+  intensity="1" 
+  position="-1 2 0" 
+  rotation="-90 0 0" 
+  angle="45" 
+  penumbra="0.5" 
+  decay="2">
+</a-light>
+
+<!-- Luz Spot 2 (Derecha) -->
+<a-light 
+  type="spot" 
+  color="##ffcc00" 
+  intensity="1" 
+  position="1 2 0" 
+  rotation="-90 0 0" 
+  angle="45" 
+  penumbra="0.5" 
+  decay="2">
+</a-light>
       </a-entity>
       
       <!-- 1: boacuriyu -->
@@ -329,38 +353,37 @@
         // Lógica para seleccionar la animación
         const targetIndex = parseInt(targetEl.getAttribute('data-index'), 10); 
 
+        if (animations.length === 0) {
+  console.warn(`⚠️ El modelo ${targetEl.id} no tiene animaciones.`);
+  return; // Salir sin intentar configurar animaciones
+}
         // Mostrar nombres de animaciones
         console.log('Animaciones detectadas:', animations.map(a => a.name));
         // Configurar animación
         // const animationName = animations[0].name;
         let animationName;
 
-    // Lógica para seleccionar la animación
-    // if ([0, 4, 13].includes(targetIndex)) {
-    //   console.log('aguara guazu,ciervo o venado');
-
-    //       // Buscamos la animación "Idle_2"
-    //       const idleClip = animations.find(anim => anim.name === 'Idle_2_HeadLow');
-    //       // const idleClip = animations.find(anim => anim.name === 'Idle');
-
-    //       if (idleClip) {
-    //         console.log('Animacion encontrada, seteando');
-    //         animationName = 'Idle_2_HeadLow';
-    //       } else {
-    //         console.warn(`[Modelo ${targetIndex}] Animación Idle_2 no encontrada. Usando:`, animations[0]?.name);
-    //         animationName = animations[0].name;
-    //       }
-    //     } else {
-    //       console.log('diferente de targets');
-
-    //       // Comportamiento normal para otros modelos
-    //       animationName = animations[0].name;
-    //     }
+    //Lógica para seleccionar la animación
     if ([0, 4, 13].includes(targetIndex)) {
       console.log('aguara guazu,ciervo o venado');
-        const idleClip = animations.find(anim => anim.name === 'Idle_2_HeadLow');
-        animationName = idleClip ? 'Idle_2_HeadLow' : animationName;
-      }
+
+      // Buscamos la animación "Idle_2"
+          const idleClip = animations.find(anim => anim.name === 'Idle_2_HeadLow');
+          // const idleClip = animations.find(anim => anim.name === 'Idle');
+
+          if (idleClip) {
+            console.log('Animacion encontrada, seteando');
+            animationName = 'Idle_2_HeadLow';
+          } else {
+            console.warn(`[Modelo ${targetIndex}] Animación Idle_2_HeadLow no encontrada. Usando: Idle_Headlow`);
+            animationName = 'Idle_Headlow';
+          }
+        } else {
+          console.log('diferente de targets');
+
+          // Comportamiento normal para otros modelos
+          animationName = animations[0].name;
+        }
 
     console.log('Animaciones a asignar:', animationName);
     modelEl.setAttribute('animation-mixer', {
@@ -387,7 +410,7 @@
   };
   // Verificar carga del modelo
   if (modelEl.hasLoaded) {
-    console.log('modelo cargado');
+    console.log('modelo CARGADO');
     setupAnimation();
   } else {
     console.log('modelo no cargado');
@@ -406,7 +429,7 @@
     }
   }
 
-// inicialización principal
+// // inicialización principal
 // document.querySelector('a-scene').addEventListener('loaded', () => {
 //   console.log('inicialización principal');
 
@@ -438,10 +461,6 @@
             isPlaying = false;
           }
           activeAudio = audios[idx];
-          // // Control de audio
-          // if (activeAudio) activeAudio.pause();{
-          //       activeAudio = audios[idx];
-          //       isPlaying = false;}
             // reproducir la animación
             playAnimation(targetEl);
         });
@@ -457,6 +476,8 @@
 
     });
   }
+
+    // FUNCIONES DE FADE
     // targetEl.addEventListener('targetLost', () => {
     //       console.log('Target lost:', targetEl.id);
 
@@ -499,153 +520,71 @@
   
 
 
-
-
-
-
-
-
-//   AFRAME.registerComponent('fps-counter', {
-//   schema: {
-//     smoothing: { type: 'number', default: 0.9 } // Factor de suavizado
-//   },
-//   init: function () {
-//     this.frameCount = 0;
-//     this.lastTime = performance.now();
-//     this.fps = 0;
-//     this.averageFPS = 0;
-//   },
-//   tick: function (time, deltaTime) {
-//     this.frameCount++;
-    
-//     if (time - this.lastTime >= 1000) { // Actualizar cada segundo
-//       this.fps = this.frameCount;
-//       this.frameCount = 0;
-//       this.lastTime = time;
-
-//       //memoria
-// if (performance.memory) {
-//   const memory = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
-//   document.getElementById('memory').textContent = `${memory} MB`;
-// }
-
-//       // Cálculo de media móvil para suavizar
-//       this.averageFPS = 
-//         this.averageFPS === 0 
-//           ? this.fps 
-//           : this.averageFPS * this.data.smoothing + this.fps * (1 - this.data.smoothing);
-
-//       // Actualizar UI
-//       document.getElementById('fps').textContent = Math.round(this.averageFPS);
-//     }
-//   }
-// });
-
-// function updateDebugPanel() {
-//   // Contador de modelos cargados
-//   // loadedModels = document.querySelectorAll('[gltf-model]:loaded').length;
-//   // document.getElementById('loaded-count').textContent = loadedModels;
+// Componente de monitoreo
+AFRAME.registerComponent('system-monitor', {
+  schema: {
+    checkInterval: { type: 'number', default: 1000 }
+  },
   
-//   // FPS ya se actualiza automáticamente por el componente
-// }
-
-// // Inicia la actualización periódica
-// setInterval(updateDebugPanel, 500);
-
-
-
-  // // Componente FPS corregido
-  // AFRAME.registerComponent('fps-counter', {
-  //   init: function () {
-  //     this.frameCount = 0;
-  //     this.startTime = performance.now();
-  //   },
-  //   tick: function () {
-  //     this.frameCount++;
-  //     const elapsed = performance.now() - this.startTime;
-      
-  //     if (elapsed >= 1000) {
-  //       const fps = (this.frameCount / (elapsed / 1000)).toFixed(1);
-  //       document.getElementById('fps').textContent = fps;
-        
-  //       // Actualizar memoria
-  //       if (performance.memory) {
-  //         const memory = (performance.memory.usedJSHeapSize / 1e6).toFixed(1);
-  //         document.getElementById('memory').textContent = memory;
-  //       }
-        
-  //       // Reiniciar conteo
-  //       this.frameCount = 0;
-  //       this.startTime = performance.now();
-  //     }
-  //   }
-  // });
-
-// // Componente de monitoreo completo
-// AFRAME.registerComponent('system-monitor', {
-//   schema: {
-//     checkInterval: { type: 'number', default: 1000 }
-//   },
-  
-//   init: function () {
-//     this.frameCount = 0;
-//     this.startTime = performance.now();
-//     this.modelCheckInterval = null;
+  init: function () {
+    this.frameCount = 0;
+    this.startTime = performance.now();
+    this.modelCheckInterval = null;
     
-//     // Crear elementos del panel si no existen
-//     this.debugPanel = document.getElementById('debug-panel');
-//     if (!this.debugPanel) {
-//       this.debugPanel = document.createElement('div');
-//       this.debugPanel.id = 'debug-panel';
-//       this.debugPanel.innerHTML = `
-//         <div>Modelos: <span id="loaded-count">0</span>/16</div>
-//         <div>FPS: <span id="fps">0</span></div>
-//         <div>Memoria: <span id="memory">N/A</span> MB</div>
-//       `;
-//       document.body.appendChild(this.debugPanel);
-//     }
-//   },
+    // Crear elementos del panel si no existen
+    this.debugPanel = document.getElementById('debug-panel');
+    if (!this.debugPanel) {
+      this.debugPanel = document.createElement('div');
+      this.debugPanel.id = 'debug-panel';
+      this.debugPanel.innerHTML = `
+        <div>Modelos: <span id="loaded-count">0</span>/16</div>
+        <div>FPS: <span id="fps">0</span></div>
+        <div>Memoria: <span id="memory">N/A</span> MB</div>
+      `;
+      document.body.appendChild(this.debugPanel);
+    }
+  },
 
-//   tick: function () {
-//     // Medición de FPS
-//     this.frameCount++;
-//     const elapsed = performance.now() - this.startTime;
+  tick: function () {
+    // Medición de FPS
+    this.frameCount++;
+    const elapsed = performance.now() - this.startTime;
 
-//     if (elapsed >= 1000) {
-//       const fps = (this.frameCount / (elapsed / 1000)).toFixed(1);
-//       document.getElementById('fps').textContent = fps;
+    if (elapsed >= 1000) {
+      const fps = (this.frameCount / (elapsed / 1000)).toFixed(1);
+      document.getElementById('fps').textContent = fps;
       
-//       // Reiniciar conteo
-//       this.frameCount = 0;
-//       this.startTime = performance.now();
-//     }
-//   },
+      // Reiniciar conteo
+      this.frameCount = 0;
+      this.startTime = performance.now();
+    }
+  },
 
-//   update: function () {
-//     // Iniciar intervalo para modelos y memoria
-//     if (this.modelCheckInterval) clearInterval(this.modelCheckInterval);
+  update: function () {
+    // Iniciar intervalo para modelos y memoria
+    if (this.modelCheckInterval) clearInterval(this.modelCheckInterval);
     
-//     this.modelCheckInterval = setInterval(() => {
-//       // Contar modelos cargados
-//       const loadedModels = Array.from(document.querySelectorAll('[gltf-model]'))
-//         .filter(el => el.components['gltf-model']?.loaded)
-//         .length;
-//       document.getElementById('loaded-count').textContent = loadedModels;
+    this.modelCheckInterval = setInterval(() => {
+      // Contar modelos cargados
+      const loadedModels = Array.from(document.querySelectorAll('[gltf-model]'))
+        .filter(el => el.components['gltf-model']?.loaded)
+        .length;
+      document.getElementById('loaded-count').textContent = loadedModels;
 
-//       // Medir memoria
-//       if (performance.memory) {
-//         const memory = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
-//         document.getElementById('memory').textContent = memory;
-//       }
-//     }, this.data.checkInterval);
-//   }
-// });
+      // Medir memoria
+      if (performance.memory) {
+        const memory = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
+        document.getElementById('memory').textContent = memory;
+      }
+    }, this.data.checkInterval);
+  }
+});
 
 // Aplicar a la escena
 document.querySelector('a-scene').setAttribute('system-monitor', '');
 
 
-  console.log('Ibera-AR version 0.3.4');
+  console.log('Ibera-AR version 0.3.6');
 
  </script> 
  <script>
