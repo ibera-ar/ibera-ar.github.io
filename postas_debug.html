@@ -1,184 +1,182 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>  
-    
-    <style>
 
-      #sound-button {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        background: white;
-        border: 2px solid #ccc;
-        border-radius: 30px;
-        width: 50px;
-        height: 50px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        display: none;
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+  <style>
+    #sound-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      background: white;
+      border: 2px solid #ccc;
+      border-radius: 30px;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+
+    .a-enter-vr-button {
+      display: none;
+    }
+
+    .hint-container {
+      position: fixed;
+      bottom: 10%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      /* z-index: 9998; */
+    }
+
+    .hint-icon {
+      width: 64px;
+      height: 64px;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
       }
 
-      .a-enter-vr-button {
-        display: none; 
+      50% {
+        transform: scale(1.1);
       }
-      .hint-container {
-          position: fixed;
-          bottom: 10%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          pointer-events: none;
-          /* z-index: 9998; */
-        }
 
-        .hint-icon {
-          width: 64px;
-          height: 64px;
-          animation: pulse 1.5s infinite;
-        }
+      100% {
+        transform: scale(1);
+      }
+    }
 
-        @keyframes pulse {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-          100% { transform: scale(1); }
-        }
+    /* Efecto de fade */
+    .hint-visible {
+      opacity: 1 !important;
+    }
 
-        /* Efecto de fade */
-        .hint-visible {
-          opacity: 1 !important;
-        }
+    .debug-panel {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: monospace;
+      z-index: 9999;
+    } 
+  </style>
+</head>
 
-        .debug-panel{
-          position: fixed;
-          top: 10px;
-          left: 10px;
-          background: rgba(0,0,0,0.7);
-          color: white;
-          padding: 10px;
-          border-radius: 8px;
-          font-family: monospace;
-          z-index: 9999;
-        }
-    </style>
-  </head>
-  <body>
-    <!-- Interfaz -->
-      <!-- Debug panel -->
-      <div id="debug-panel" class="debug-panel">
-      <div>Modelos cargados: <span id="loaded-count">0</span>/16</div>
-      <div>FPS: <span id="fps">0</span></div>
-      <div>MEM: <span id="memory">0</span></div></div>
+<body>
+  <!-- Interfaz -->
+  <!-- control de sonido -->
+  <button id="sound-button" onclick="toggleSound()">🔊</button>
+  <!-- indicador de rotacion -->
+  <div id="rotation-hint" class="hint-container">
+    <img src="rotation.png" alt="Rotation" class="hint-icon">
+  </div>
 
-    <!-- control de sonido -->
-    <button id="sound-button" onclick="toggleSound()">🔊</button>
-    <!-- indicador de rotacion -->
-    <div id="rotation-hint" class="hint-container">
-      <img src="rotation.png" alt="Rotation" class="hint-icon">
-    </div>
+  <!-- Debug MODE
+   system-monitor 
+   -->
+  <a-scene mindar-image="imageTargetSrc: assets/targets.mind;" vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: true" id="ar-scene"    
+    system-monitor     
+    >
+<!-- assets para cada target -->
+    <a-assets> 
+      <!-- 0: aguaraguazu -->
+      <a-asset-item id="model-0" src="assets/aguaraguazu.glb"></a-asset-item>
+      <audio id="audio-0" src="assets/aguaraguazu.mp3" loop></audio>
 
-    <a-scene 
-      mindar-image="imageTargetSrc: assets/targets.mind;" 
-      vr-mode-ui="enabled: false" 
-      device-orientation-permission-ui="enabled: true"
-      id="ar-scene"    
-      system-monitor>
-      <a-assets timeout="10000">     <!-- assets para cada target -->
-        <!-- 0: aguaraguazu -->
-        <a-asset-item id="model-0" src="assets/aguaraguazu.glb" ></a-asset-item>
-        <audio id="audio-0" src="assets/aguaraguazu.mp3" loop></audio>
-        
-        <!-- 1: boacuriyu -->
-        <a-asset-item id="model-1" src="assets/boacuriyu.glb"></a-asset-item>
-        <audio id="audio-1" src="assets/boacuriyu.mp3" loop></audio>
-        
-        <!-- 2: caraya -->
-        <a-asset-item id="model-2" src="assets/caraya.glb"></a-asset-item>
-        <audio id="audio-2" src="assets/caraya.mp3" loop></audio>
-        
-        <!-- 3: carpincho -->
-        <a-asset-item id="model-3" src="assets/carpincho.glb" ></a-asset-item>
-        <audio id="audio-3" src="assets/carpincho.mp3" loop></audio>
-        
-        <!-- 4: ciervo -->
-        <a-asset-item id="model-4" src="assets/ciervo.glb" ></a-asset-item>
-        <audio id="audio-4" src="assets/ciervo.mp3" loop></audio>
-        
-        <!-- 5: dorado -->
-        <a-asset-item id="model-5" src="assets/dorado.glb" ></a-asset-item>
-        <audio id="audio-5" src="assets/dorado.mp3" loop></audio>
-        
-        <!-- 6: jabiru -->
-        <a-asset-item id="model-6" src="assets/jabiru.glb" ></a-asset-item>
-        <audio id="audio-6" src="assets/jabiru.mp3" loop></audio>
-        
-        <!-- 7: jacana -->
-        <a-asset-item id="model-7" src="assets/jacana.glb" ></a-asset-item>
-        <audio id="audio-7" src="assets/jacana.mp3" loop></audio>
-        
-        <!-- 8: jaguarete -->
-        <a-asset-item id="model-8" src="assets/jaguarete.glb" ></a-asset-item>
-        <audio id="audio-8" src="assets/jaguarete.mp3" loop></audio>
-        
-        <!-- 9: nutria -->
-        <a-asset-item id="model-9" src="assets/nutria.glb"></a-asset-item>
-        <audio id="audio-9" src="assets/nutria.mp3" loop></audio>
-        
-        <!-- 10: osohormiguero -->
-        <a-asset-item id="model-10" src="assets/osohormiguero.glb" ></a-asset-item>
-        <audio id="audio-10" src="assets/osohormiguero.mp3" loop></audio>
-        
-        <!-- 11: tararira -->
-        <a-asset-item id="model-11" src="assets/tararira.glb" ></a-asset-item>
-        <audio id="audio-11" src="assets/tararira.mp3" loop></audio>
-        
-        <!-- 12: tordo -->
-        <a-asset-item id="model-12" src="assets/tordo.glb" ></a-asset-item>
-        <audio id="audio-12" src="assets/tordo.mp3" loop></audio>
-        
-        <!-- 13: venado -->
-        <a-asset-item id="model-13" src="assets/venado.glb" ></a-asset-item>
-        <audio id="audio-13" src="assets/venado.mp3" loop></audio>
-        
-        <!-- 14: yacare -->
-        <a-asset-item id="model-14" src="assets/yacare.glb" ></a-asset-item>
-        <audio id="audio-14" src="assets/yacare.mp3" loop></audio>
-        
-        <!-- 15: yetapa -->
-        <a-asset-item id="model-15" src="assets/yetapa.glb" ></a-asset-item>
-        <audio id="audio-15" src="assets/yetapa.mp3" loop></audio>
-      </a-assets>
+      <!-- 1: boacuriyu -->
+      <a-asset-item id="model-1" src="assets/boacuriyu.glb"></a-asset-item>
+      <audio id="audio-1" src="assets/boacuriyu.mp3" loop></audio>
+
+      <!-- 2: caraya -->
+      <a-asset-item id="model-2" src="assets/caraya.glb"></a-asset-item>
+      <audio id="audio-2" src="assets/caraya.mp3" loop></audio>
+
+      <!-- 3: carpincho -->
+      <a-asset-item id="model-3" src="assets/carpincho.glb"></a-asset-item>
+      <audio id="audio-3" src="assets/carpincho.mp3" loop></audio>
+
+      <!-- 4: ciervo -->
+      <a-asset-item id="model-4" src="assets/ciervo.glb"></a-asset-item>
+      <audio id="audio-4" src="assets/ciervo.mp3" loop></audio>
+
+      <!-- 5: dorado -->
+      <a-asset-item id="model-5" src="assets/dorado.glb"></a-asset-item>
+      <audio id="audio-5" src="assets/dorado.mp3" loop></audio>
+
+      <!-- 6: jabiru -->
+      <a-asset-item id="model-6" src="assets/jabiru.glb"></a-asset-item>
+      <audio id="audio-6" src="assets/jabiru.mp3" loop></audio>
+
+      <!-- 7: jacana -->
+      <a-asset-item id="model-7" src="assets/jacana.glb"></a-asset-item>
+      <audio id="audio-7" src="assets/jacana.mp3" loop></audio>
+
+      <!-- 8: jaguarete -->
+      <a-asset-item id="model-8" src="assets/jaguarete.glb"></a-asset-item>
+      <audio id="audio-8" src="assets/jaguarete.mp3" loop></audio>
+
+      <!-- 9: nutria -->
+      <a-asset-item id="model-9" src="assets/nutria.glb"></a-asset-item>
+      <audio id="audio-9" src="assets/nutria.mp3" loop></audio>
+
+      <!-- 10: osohormiguero -->
+      <a-asset-item id="model-10" src="assets/osohormiguero.glb"></a-asset-item>
+      <audio id="audio-10" src="assets/osohormiguero.mp3" loop></audio>
+
+      <!-- 11: tararira -->
+      <a-asset-item id="model-11" src="assets/tararira.glb"></a-asset-item>
+      <audio id="audio-11" src="assets/tararira.mp3" loop></audio>
+
+      <!-- 12: tordo -->
+      <a-asset-item id="model-12" src="assets/tordo.glb"></a-asset-item>
+      <audio id="audio-12" src="assets/tordo.mp3" loop></audio>
+
+      <!-- 13: venado -->
+      <a-asset-item id="model-13" src="assets/venado.glb"></a-asset-item>
+      <audio id="audio-13" src="assets/venado.mp3" loop></audio>
+
+      <!-- 14: yacare -->
+      <a-asset-item id="model-14" src="assets/yacare.glb"></a-asset-item>
+      <audio id="audio-14" src="assets/yacare.mp3" loop></audio>
+
+      <!-- 15: yetapa -->
+      <a-asset-item id="model-15" src="assets/yetapa.glb"></a-asset-item>
+      <audio id="audio-15" src="assets/yetapa.mp3" loop></audio>
+    </a-assets>
 
     <!-- Lights -->
-     <!-- <a-entity light="type: directional; color: #ff0094; intensity: 1"></a-entity>  -->
+    <!-- <a-entity light="type: directional; color: #ff0094; intensity: 1"></a-entity>  -->
     <!-- <a-entity light="type: directional; color: #fff; intensity: 0.8" 
     position="-0.5 1 1" castShadow: true
     ></a-entity> -->
     <!-- <a-entity cursor position="0 0 0"></a-entity>    -->
     <a-light type="ambient" color="#ffcc00" intensity="0.1"></a-light>
- 
+
     <!-- Luz Spot 1 (Izquierda) -->
-         <a-entity light 
-         type="spot" 
-         color="##ffcc00" 
-         intensity="0.1" 
-         position="-1 2 0" 
-         rotation="-90 0 0" 
-         angle="45" 
-         penumbra="0.5" 
-         decay="2">
-     </a-entity> 
-       
-       <!-- Luz Spot 2 (Derecha) -->
-     <!--    <a-entity light 
+    <a-entity light type="spot" color="##ffcc00" intensity="0.1" position="-1 2 0" rotation="-90 0 0" angle="45"
+      penumbra="0.5" decay="2">
+    </a-entity>
+
+    <!-- Luz Spot 2 (Derecha) -->
+    <!--    <a-entity light 
        type="spot" 
          color="##ffcc00" 
          intensity="0.1" 
@@ -188,217 +186,170 @@
          penumbra="0.5" 
          decay="2">
         </a-entity> -->
-        <!-- entidades para cada target -->      
-      <!-- 0: aguaraguazu -->
-      <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
-        <a-entity gltf-model="#model-0" scale="0.15 0.15 0.15" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        animation__position="property: position; from: 0 0 -1; to: 0 0 0; dur: 1000; easing: easeInOutQuad; startEvents: targetFound"
-        animation__fadein="property: opacity; from: 0; to: 1; dur: 1000; easing: easeInOutQuad; startEvents: targetFound"
-        animation__fadeout="property: opacity; from: 1; to: 0; dur: 1000; easing: easeInOutQuad; startEvents: targetLost"
-     
-        ></a-entity>
-      </a-entity>
-      
-      <!-- 1: boacuriyu -->
-      <a-entity mindar-image-target="targetIndex: 1" data-index="1" id="target-1">
-         
-        <a-entity gltf-model="#model-1" scale="0.03 0.03 0.03" 
-        position="0 0 0" 
-        rotation="45 15 0" 
-        custom-rotation="sensitivity: 0.2"  
-        >
-      </a-entity>  
 
+    <!-- entidades para cada target -->
+    <!-- 0: aguaraguazu -->
+    <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
+      <a-entity gltf-model="#model-0" 
+                scale="0.15 0.15 0.15" 
+                position="0 0 0" 
+                rotation="0 -90 0"
+                custom-rotation="sensitivity: 0.2">
+      </a-entity>
+    </a-entity>
+
+    <!-- 1: boacuriyu -->
+    <a-entity mindar-image-target="targetIndex: 1" data-index="1" id="target-1">
+
+      <a-entity gltf-model="#model-1" scale="0.03 0.03 0.03" position="0 0 0" rotation="45 15 0"
+        custom-rotation="sensitivity: 0.2">
       </a-entity>
 
-      <!-- 2: caraya -->
-      <a-entity mindar-image-target="targetIndex: 2" data-index="2" id="target-2">
-         
-        <a-entity gltf-model="#model-2" scale="0.1 0.1 0.1" 
-        position="0 0 0" 
-        rotation="0 0 0" 
-        custom-rotation="sensitivity: 0.2"  
-        >
+    </a-entity>
+
+    <!-- 2: caraya -->
+    <a-entity mindar-image-target="targetIndex: 2" data-index="2" id="target-2">
+
+      <a-entity gltf-model="#model-2" scale="0.1 0.1 0.1" position="0 0 0" rotation="0 0 0"
+        custom-rotation="sensitivity: 0.2">
       </a-entity>
-    </a-entity>  
-      
-      <!-- 3: carpincho -->
-      <a-entity mindar-image-target="targetIndex: 3" data-index="3" id="target-3">
-         
-        <a-entity gltf-model="#model-3" scale="0.7 0.7 0.7" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        smooth-position="targetPosition: 0 0 0; smoothness: 0.05"
+    </a-entity>
 
-        ></a-entity>     
-      </a-entity>  
-      
-      <!-- 4: ciervo -->
-      <a-entity mindar-image-target="targetIndex: 4" data-index="4" id="target-4">
+    <!-- 3: carpincho -->
+    <a-entity mindar-image-target="targetIndex: 3" data-index="3" id="target-3">
 
-        <a-entity gltf-model="#model-4" scale="0.1 0.1 0.1" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>    
-      </a-entity>  
-      
-      <!-- 5: dorado -->
-      <a-entity mindar-image-target="targetIndex: 5" data-index="5" id="target-5">
-        <a-entity gltf-model="#model-5" scale="0.4 0.4 0.4" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>     
-      </a-entity>  
-      
-      <!-- 6: jabiru -->
-      <a-entity mindar-image-target="targetIndex: 6" data-index="6" id="target-6">
-        <a-entity gltf-model="#model-6" scale="0.05 0.05 0.05" 
-        position="0 -0.2 0" 
-        rotation="0 0 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>    
-      </a-entity>  
-      
-      <!-- 7: jacana -->
-      <a-entity mindar-image-target="targetIndex: 7" data-index="7" id="target-7">
-        <a-entity gltf-model="#model-7" scale="0.6 0.6 0.6" 
-        position="0 -0.2 -0.2" 
-        rotation="0 0 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>    
-      </a-entity>  
-      
-      <!-- 8: jaguarete -->
-      <a-entity mindar-image-target="targetIndex: 8" data-index="8" id="target-8">
-        <a-entity gltf-model="#model-8" scale="0.005 0.005 0.005" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>     
-      </a-entity>  
-      
-      <!-- 9: nutria -->
-      <a-entity mindar-image-target="targetIndex: 9" data-index="9" id="target-9">
-        <a-entity gltf-model="#model-9" scale="0.2 0.2 0.2" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>    
-      </a-entity>  
-      
-      <!-- 10: osohormiguero -->
-      <a-entity mindar-image-target="targetIndex: 10" data-index="10" id="target-10">
-         
-        <a-entity gltf-model="#model-10" scale="0.15 0.15 0.15" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>     
-      </a-entity>  
-      
-      <!-- 11: tararira -->
-      <a-entity mindar-image-target="targetIndex: 11" data-index="11" id="target-11">
-        <a-entity gltf-model="#model-11" scale="0.2 0.2 0.2" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>    
-      </a-entity>  
-      
-      <!-- 12: tordo -->
-      <a-entity mindar-image-target="targetIndex: 12" data-index="12" id="target-12">
-        <a-entity gltf-model="#model-12" scale="0.8 0.8 0.8" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>  
-      </a-entity>  
-      
-      <!-- 13: venado -->
-      <a-entity mindar-image-target="targetIndex: 13" data-index="13" id="target-13">
+      <a-entity gltf-model="#model-3" scale="0.7 0.7 0.7" position="0 0 0" rotation="0 -90 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
 
-        <a-entity gltf-model="#model-13" scale="0.15 0.15 0.15" 
-        position="0 -0.2 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>    
-      </a-entity>  
-      
-      <!-- 14: yacare -->
-      <a-entity mindar-image-target="targetIndex: 14" data-index="14" id="target-14">
+    <!-- 4: ciervo -->
+    <a-entity mindar-image-target="targetIndex: 4" data-index="4" id="target-4">
 
-        <a-entity gltf-model="#model-14" scale="0.28 0.28 0.28" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>    
-      </a-entity>  
-      
-      <!-- 15: yetapa -->
-      <a-entity mindar-image-target="targetIndex: 15" data-index="15" id="target-15">
+      <a-entity gltf-model="#model-4" scale="0.1 0.1 0.1" position="0 0 0" rotation="0 -90 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
 
-        <a-entity gltf-model="#model-15" scale="0.6 0.6 0.6" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      
+    <!-- 5: dorado -->
+    <a-entity mindar-image-target="targetIndex: 5" data-index="5" id="target-5">
+      <a-entity gltf-model="#model-5" scale="0.4 0.4 0.4" position="0 0 0" rotation="0 -90 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
 
-    </a-entity>  
+    <!-- 6: jabiru -->
+    <a-entity mindar-image-target="targetIndex: 6" data-index="6" id="target-6">
+      <a-entity gltf-model="#model-6" scale="0.05 0.05 0.05" position="0 -0.2 0" rotation="0 0 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
 
-      <a-camera id="camera" position="0 0 0" look-controls="enabled: false"></a-camera>
-    </a-scene>
+    <!-- 7: jacana -->
+    <a-entity mindar-image-target="targetIndex: 7" data-index="7" id="target-7">
+      <a-entity gltf-model="#model-7" scale="0.6 0.6 0.6" position="0 -0.2 -0.2" rotation="0 0 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
 
-<script>
+    <!-- 8: jaguarete -->
+    <a-entity mindar-image-target="targetIndex: 8" data-index="8" id="target-8">
+      <a-entity gltf-model="#model-8" scale="0.005 0.005 0.005" position="0 0 0" rotation="0 -90 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
 
-  // Variables existentes
-  let isPlaying = false;
-  let activeAudio = null;
-  const soundButton = document.getElementById('sound-button');
-  const audios = Array.from({length: 16}, (_, i) => document.getElementById(`audio-${i}`));
-  const hint = document.getElementById('rotation-hint');
+    <!-- 9: nutria -->
+    <a-entity mindar-image-target="targetIndex: 9" data-index="9" id="target-9">
+      <a-entity gltf-model="#model-9" scale="0.2 0.2 0.2" position="0 0 0" rotation="0 -90 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
 
-  // PLAY // Animation
-  function playAnimation(targetEl) {
-    console.log('playAnimation function enabled');
-    console.log('Estructura del target:', targetEl);
-    console.log('Elementos con gltf-model:', targetEl.querySelectorAll('[gltf-model]'));
-    const modelEl = targetEl.querySelector('[gltf-model]');
-    console.log('Estructura del modelo:', modelEl.object3D);
-    console.log('Esqueleto encontrado:', modelEl.object3D.traverse(obj => {
+    <!-- 10: osohormiguero -->
+    <a-entity mindar-image-target="targetIndex: 10" data-index="10" id="target-10">
+
+      <a-entity gltf-model="#model-10" scale="0.15 0.15 0.15" position="0 0 0" rotation="0 -90 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
+
+    <!-- 11: tararira -->
+    <a-entity mindar-image-target="targetIndex: 11" data-index="11" id="target-11">
+      <a-entity gltf-model="#model-11" scale="0.2 0.2 0.2" position="0 0 0" rotation="0 -90 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
+
+    <!-- 12: tordo -->
+    <a-entity mindar-image-target="targetIndex: 12" data-index="12" id="target-12">
+      <a-entity gltf-model="#model-12" scale="0.8 0.8 0.8" position="0 0 0" rotation="0 -90 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
+
+    <!-- 13: venado -->
+    <a-entity mindar-image-target="targetIndex: 13" data-index="13" id="target-13">
+
+      <a-entity gltf-model="#model-13" scale="0.15 0.15 0.15" position="0 -0.2 0" rotation="0 -90 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
+
+    <!-- 14: yacare -->
+    <a-entity mindar-image-target="targetIndex: 14" data-index="14" id="target-14">
+
+      <a-entity gltf-model="#model-14" scale="0.28 0.28 0.28" position="0 0 0" rotation="0 -90 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+    </a-entity>
+
+    <!-- 15: yetapa -->
+    <a-entity mindar-image-target="targetIndex: 15" data-index="15" id="target-15">
+
+      <a-entity gltf-model="#model-15" scale="0.6 0.6 0.6" position="0 0 0" rotation="0 -90 0"
+        custom-rotation="sensitivity: 0.2"></a-entity>
+
+    </a-entity>
+
+    <a-camera id="camera" position="0 0 0" look-controls="enabled: false"></a-camera>
+  </a-scene>
+
+  <script>
+
+    // Variables existentes
+    let isPlaying = false;
+    let activeAudio = null;
+    const soundButton = document.getElementById('sound-button');
+    const audios = Array.from({ length: 16 }, (_, i) => document.getElementById(`audio-${i}`));
+    const hint = document.getElementById('rotation-hint');
+
+    // PLAY // Animation
+    function playAnimation(targetEl) {
+      console.log('playAnimation function enabled');
+      console.log('Estructura del target:', targetEl);
+      console.log('Elementos con gltf-model:', targetEl.querySelectorAll('[gltf-model]'));
+      const modelEl = targetEl.querySelector('[gltf-model]');
+      console.log('Estructura del modelo:', modelEl.object3D);
+      console.log('Esqueleto encontrado:', modelEl.object3D.traverse(obj => {
         if (obj.isBone) console.log('Hueso:', obj.name);
-        }));
-    if (!modelEl) {
-    console.error('⚠️ Modelo no encontrado en el target:', targetEl.id);
-    return;
-    }
-    const setupAnimation = () => {
+      }));
+      if (!modelEl) {
+        console.error('⚠️ Modelo no encontrado en el target:', targetEl.id);
+        return;
+      }
+      const setupAnimation = () => {
         const modelData = modelEl.components['gltf-model'];
         // Obtener animaciones directamente del modelo
         const animations = modelData.model.animations;
         // Lógica para seleccionar la animación
-        const targetIndex = parseInt(targetEl.getAttribute('data-index'), 10); 
+        const targetIndex = parseInt(targetEl.getAttribute('data-index'), 10);
 
         if (animations.length === 0) {
-  console.warn(`⚠️ El modelo ${targetEl.id} no tiene animaciones.`);
-  return; // Salir sin intentar configurar animaciones
-}
+          console.warn(`⚠️ El modelo ${targetEl.id} no tiene animaciones.`);
+          return; // Salir sin intentar configurar animaciones
+        }
+
+
         // Mostrar nombres de animaciones
         console.log('Animaciones detectadas:', animations.map(a => a.name));
         // Configurar animación
         // const animationName = animations[0].name;
         let animationName;
 
-    //Lógica para seleccionar la animación
-    if ([0, 4, 13].includes(targetIndex)) {
-      console.log('aguara guazu,ciervo o venado');
+        //Lógica para seleccionar la animación
+        if ([0, 4, 13].includes(targetIndex)) {
+          console.log('aguara guazu,ciervo o venado');
 
-      // Buscamos la animación "Idle_2"
+          // Buscamos la animación "Idle_2"
           const idleClip = animations.find(anim => anim.name === 'Idle_2_HeadLow');
           // const idleClip = animations.find(anim => anim.name === 'Idle');
 
@@ -416,287 +367,250 @@
           animationName = animations[0].name;
         }
 
-    console.log('Animaciones a asignar:', animationName);
-    modelEl.setAttribute('animation-mixer', {
-      clip: animationName,
-      loop: true,
-      timeScale: 1, //acelerar o ralentizar la animación.
-  });
-  console.log('asignado:', animationName);
-
-  setTimeout(() => {
-  const mixerComponent = modelEl.components['animation-mixer'];
-  if (mixerComponent?.mixer) {
-    // Buscar el clip por nombre
-    const clip = animations.find(anim => anim.name === animationName);
-    if (clip) {
-      const action = mixerComponent.mixer.clipAction(clip);
-      action.loop = THREE.LoopRepeat;
-      action.play();
-      console.log('▶️ Reproduciendo:', animationName);
-    }
-  }
-}, 200);
-
-  };
-
-
-  // Verificar carga del modelo
-  if (modelEl.hasLoaded) {
-    console.log('modelo CARGADO');
-
-    setupAnimation();
-  } else {
-    console.log('modelo no cargado');
-    modelEl.addEventListener('model-loaded', setupAnimation, { once: true });
-  }
-}
-
-  // STOP // Animation
-  // Aquí se remueve el componente para detenerla. A lo bruto
-  function stopAnimation(targetEl) {
-    const modelEl = targetEl.querySelector('[gltf-model]');
-    if (modelEl) {
-      console.log('Remove animation mixer att:', targetEl.id);
-
-      modelEl.removeAttribute('animation-mixer');
-    }
-  }
-
-// // inicialización principal
-// document.querySelector('a-scene').addEventListener('loaded', () => {
-//   console.log('inicialización principal');
-
-//         const targets = document.querySelectorAll('[mindar-image-target]');
-//         targets.forEach((targetEl) => {
-//           initTargetListeners(targetEl);
-//         });
-//       });
-  // Inicialización principal
-  document.querySelector('a-scene').addEventListener('loaded', () => {
-    document.querySelectorAll('[mindar-image-target]').forEach(initTargetListeners);
-  });
-
-// Inicialización de listeners
-  function initTargetListeners(targetEl) {
-    console.log('target individual iniciado');
-                                        // TARGET ENCONTRADO
-    targetEl.addEventListener('targetFound', () => {
-          console.log('Target found:', targetEl.id);
-          const idx = targetEl.getAttribute('data-index');
-          // Mostrar elementos
-          soundButton.style.display = 'flex';
-          hint.style.display = 'block';
-          hint.classList.add('hint-visible');
-
-          // Limpiar cualquier timer previo
-    clearTimeout(hint.timeout);
-          if (activeAudio && isPlaying) {
-            activeAudio.pause();
-            isPlaying = false;
-          }
-          activeAudio = audios[idx];
-            // reproducir la animación
-            playAnimation(targetEl);
+        console.log('Animaciones a asignar:', animationName);
+        modelEl.setAttribute('animation-mixer', {
+          clip: animationName,
+          loop: true,
+          timeScale: 1, //acelerar o ralentizar la animación.
         });
-                                        // TARGET PERDIDO
-      targetEl.addEventListener('targetLost', () => {
-      // Ocultar elementos
+        console.log('asignado:', animationName);
+
+        setTimeout(() => {
+          const mixerComponent = modelEl.components['animation-mixer'];
+          if (mixerComponent?.mixer) {
+            // Buscar el clip por nombre
+            const clip = animations.find(anim => anim.name === animationName);
+            if (clip) {
+              const action = mixerComponent.mixer.clipAction(clip);
+              action.loop = THREE.LoopRepeat;
+              action.play();
+              console.log('▶️ Reproduciendo:', animationName);
+            }
+          }
+        }, 200);
+
+      };
 
 
-  // Espera a que termine la animación antes de ocultar elementos
-  setTimeout(() => {
-    hint.style.display = 'none';
-    soundButton.style.display = 'none';
-  }, 1000); // Duración del fadeout
-  
-      hint.style.display = 'none';
-      soundButton.style.display = 'none';
-      // Detener audio
-      if (activeAudio) activeAudio.pause();
-      // Detener animación
-      stopAnimation(targetEl); 
+      // Verificar carga del modelo
+      if (modelEl.hasLoaded) {
+        console.log('modelo CARGADO');
 
+        setupAnimation();
+      } else {
+        console.log('modelo no cargado');
+        modelEl.addEventListener('model-loaded', setupAnimation, { once: true });
+      }
+    }
+
+    // STOP // Animation
+    // Aquí se remueve el componente para detenerla. A lo bruto
+    function stopAnimation(targetEl) {
+      const modelEl = targetEl.querySelector('[gltf-model]');
+      if (modelEl) {
+        console.log('Stop Animation in:', targetEl.id);
+
+        modelEl.removeAttribute('animation-mixer');
+      }
+    }
+
+    // Inicialización principal
+    document.querySelector('a-scene').addEventListener('loaded', () => {
+      document.querySelectorAll('[mindar-image-target]').forEach(initTargetListeners);
     });
-  }
 
-      function toggleSound() {
-        if (!activeAudio) return;
-        if (isPlaying) {
+    // Inicialización de listeners
+    function initTargetListeners(targetEl) {
+      console.log('Target Iniciado');
+                                                           // TARGET ENCONTRADO
+      targetEl.addEventListener('targetFound', () => {
+        console.log('Target found:', targetEl.id);
+        const idx = targetEl.getAttribute('data-index');
+        // Mostrar elementos
+        soundButton.style.display = 'flex';
+        hint.style.display = 'block';
+        hint.classList.add('hint-visible');
+
+        // Limpiar cualquier timer previo
+        clearTimeout(hint.timeout);
+        if (activeAudio && isPlaying) {
           activeAudio.pause();
-        } else {
-          activeAudio.play();
+          isPlaying = false;
         }
-        isPlaying = !isPlaying;
-      }
-
-  // Forzar modo WebGL2 para mejor compatibilidad
-  AFRAME.registerComponent('force-webgl2', {
-    init: function () {
-      if (this.el.sceneEl.renderer && this.el.sceneEl.renderer.capabilities.isWebGL2) {
-        this.el.sceneEl.renderer.outputEncoding = THREE.sRGBEncoding;
-      }
-    }
-  });
-  // Aplicar a la escena
-  document.querySelector('a-scene').setAttribute('force-webgl2', '');
-  
-
-
-// // Debug MODE
-AFRAME.registerComponent('system-monitor', {
-  schema: {
-    checkInterval: { type: 'number', default: 1000 }
-  },
-  init: function () {
-    this.frameCount = 0;
-    this.startTime = performance.now();
-    this.modelCheckInterval = null;
-    this.loadedModelCount = 0; // Contador de modelos cargados
-
-    // Crear elementos del panel si no existen
-    this.debugPanel = document.getElementById('debug-panel');
-    if (!this.debugPanel) {
-      this.debugPanel = document.createElement('div');
-      this.debugPanel.id = 'debug-panel';
-      this.debugPanel.innerHTML = `
-        <div>Modelos: <span id="loaded-count">0</span>/16</div>
-        <div>FPS: <span id="fps">0</span></div>
-        <div>Memoria: <span id="memory">N/A</span> MB</div>
-      `;
-      document.body.appendChild(this.debugPanel);
-    }
-
-    // Escuchar eventos de carga de modelos
-    const modelEls = document.querySelectorAll('[gltf-model]');
-    modelEls.forEach(modelEl => {
-      modelEl.addEventListener('model-loaded', () => {
-        this.loadedModelCount++; // Incrementar contador cuando un modelo se carga
-        this.updateLoadedModelsDisplay(); // Actualizar el indicador
+        activeAudio = audios[idx];
+        // reproducir la animación
+        playAnimation(targetEl);
       });
-    });
-  },
-  tick: function () {
-    // Medición de FPS
-    this.frameCount++;
-    const elapsed = performance.now() - this.startTime;
-    if (elapsed >= 1000) {
-      const fps = (this.frameCount / (elapsed / 1000)).toFixed(1);
-      document.getElementById('fps').textContent = fps;
-      // Reiniciar conteo
-      this.frameCount = 0;
-      this.startTime = performance.now();
+                                                      // TARGET PERDIDO
+      targetEl.addEventListener('targetLost', () => {
+        // Ocultar elementos
+        hint.style.display = 'none';
+        soundButton.style.display = 'none';
+
+        // Detener audio
+        if (activeAudio) activeAudio.pause();
+        // Detener animación
+        stopAnimation(targetEl);
+
+      });
     }
-  },
-  update: function () {
-    // Iniciar intervalo para memoria
-    if (this.modelCheckInterval) clearInterval(this.modelCheckInterval);
-    this.modelCheckInterval = setInterval(() => {
-      // Medir memoria
-      if (performance.memory) {
-        const memory = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
-        document.getElementById('memory').textContent = memory;
+
+    function toggleSound() {
+      if (!activeAudio) return;
+      if (isPlaying) {
+        activeAudio.pause();
+      } else {
+        activeAudio.play();
       }
-    }, this.data.checkInterval);
-  },
-  updateLoadedModelsDisplay: function () {
-    // Actualizar el indicador de modelos cargados
-    document.getElementById('loaded-count').textContent = this.loadedModelCount;
-  }
-});
-
-// Aplicar a la escena
-// document.querySelector('a-scene').setAttribute('system-monitor', '');
-
-
-  console.log('Ibera-AR version 0.4.0');
-
- </script> 
- <script>
-
-
-AFRAME.registerComponent('custom-rotation', {
-  schema: {
-    sensitivity: { type: 'number', default: 0.2 }, // Sensibilidad del movimiento
-    smoothness: { type: 'number', default: 0.2 }  // Controla la suavidad (0.01 = muy suave, 1 = instantáneo)
-  },
-  init: function () {
-    this.rotationY = 0; // Rotación actual en el eje Y
-    this.targetRotationY = 0; // Rotación objetivo (hacia donde queremos girar)
-    this.touchStartX = 0;
-    this.isDragging = false;
-
-    // Evento de inicio de toque
-    this.el.sceneEl.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) {
-        this.touchStartX = e.touches[0].pageX;
-        this.isDragging = true;
-      }
-    });
-
-    // Evento de movimiento de toque
-    this.el.sceneEl.addEventListener('touchmove', (e) => {
-      if (this.isDragging && e.touches.length === 1) {
-        const deltaX = e.touches[0].pageX - this.touchStartX;
-        this.targetRotationY += deltaX * this.data.sensitivity; // Actualizar rotación objetivo
-        this.touchStartX = e.touches[0].pageX;
-      }
-    });
-
-    // Evento de inicio de arrastre con mouse
-    this.el.sceneEl.addEventListener('mousedown', (e) => {
-      if (e.button === 0) { // Botón izquierdo
-        this.touchStartX = e.pageX;
-        this.isDragging = true;
-      }
-    });
-
-    // Evento de movimiento con mouse
-    this.el.sceneEl.addEventListener('mousemove', (e) => {
-      if (this.isDragging) {
-        const deltaX = e.pageX - this.touchStartX;
-        this.targetRotationY += deltaX * this.data.sensitivity; // Actualizar rotación objetivo
-        this.touchStartX = e.pageX;
-      }
-    });
-
-    // Detener el arrastre (tanto para touch como mouse)
-    this.el.sceneEl.addEventListener('mouseup', () => {
-      this.isDragging = false;
-    });
-    this.el.sceneEl.addEventListener('touchend', () => {
-      this.isDragging = false;
-    });
-  },
-  tick: function () {
-    // Interpolación suave entre la rotación actual y la rotación objetivo
-    if (this.rotationY !== this.targetRotationY) {
-      this.rotationY += (this.targetRotationY - this.rotationY) * this.data.smoothness;
-      this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
+      isPlaying = !isPlaying;
     }
-  }
-});
+
+    // Forzar modo WebGL2 para mejor compatibilidad
+    AFRAME.registerComponent('force-webgl2', {
+      init: function () {
+        if (this.el.sceneEl.renderer && this.el.sceneEl.renderer.capabilities.isWebGL2) {
+          this.el.sceneEl.renderer.outputEncoding = THREE.sRGBEncoding;
+        }
+      }
+    });
+    // Aplicar a la escena
+    document.querySelector('a-scene').setAttribute('force-webgl2', '');
 
 
-</script> 
-<script>AFRAME.registerComponent('smooth-position', {
-  schema: {
-    targetPosition: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
-    smoothness: { type: 'number', default: 0.1 }
-  },
-  init: function () {
-    this.currentPosition = new THREE.Vector3();
-  },
-  tick: function () {
-    const targetPosition = new THREE.Vector3(
-      this.data.targetPosition.x,
-      this.data.targetPosition.y,
-      this.data.targetPosition.z
-    );
-    this.currentPosition.lerp(targetPosition, this.data.smoothness);
-    this.el.object3D.position.copy(this.currentPosition);
-  }
-});
-</script>
-  </body>
+
+    // // Debug MODE
+    AFRAME.registerComponent('system-monitor', {
+      schema: {
+        checkInterval: { type: 'number', default: 1000 }
+      },
+      init: function () {
+        this.frameCount = 0;
+        this.startTime = performance.now();
+        this.modelCheckInterval = null;
+        this.loadedModelCount = 0; // Contador de modelos cargados
+
+          // 1. Verificar si el panel existe
+          let debugPanel = document.querySelector('#debug-panel');
+
+              // 2. Si NO existe, crearlo
+              if (!debugPanel) {
+                debugPanel = document.createElement('div');
+                debugPanel.id = 'debug-panel';
+                debugPanel.className = 'debug-panel';
+                debugPanel.innerHTML = `
+                  <div>Modelos: <span id="loaded-count">0</span>/16</div>
+                  <div>FPS: <span id="fps">0</span></div>
+                  <div>Memoria: <span id="memory">N/A</span> MB</div>
+                `;
+                document.body.appendChild(debugPanel); // Agregar al DOM
+              }
+
+        // Escuchar eventos de carga de modelos
+        const modelEls = document.querySelectorAll('[gltf-model]');
+        modelEls.forEach(modelEl => {
+          modelEl.addEventListener('model-loaded', () => {
+            this.loadedModelCount++; // Incrementar contador cuando un modelo se carga
+            this.updateLoadedModelsDisplay(); // Actualizar el indicador
+          });
+        });
+      },
+      tick: function () {
+        // Medición de FPS
+        this.frameCount++;
+        const elapsed = performance.now() - this.startTime;
+        if (elapsed >= 1000) {
+          const fps = (this.frameCount / (elapsed / 1000)).toFixed(1);
+          document.getElementById('fps').textContent = fps;
+          // Reiniciar conteo
+          this.frameCount = 0;
+          this.startTime = performance.now();
+        }
+      },
+      update: function () {
+        // Iniciar intervalo para memoria
+        if (this.modelCheckInterval) clearInterval(this.modelCheckInterval);
+        this.modelCheckInterval = setInterval(() => {
+          // Medir memoria
+          if (performance.memory) {
+            const memory = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
+            document.getElementById('memory').textContent = memory;
+          }
+        }, this.data.checkInterval);
+      },
+      updateLoadedModelsDisplay: function () {
+        // Actualizar el indicador de modelos cargados
+        document.getElementById('loaded-count').textContent = this.loadedModelCount;
+      }
+    });
+
+  </script>
+  <script>
+    AFRAME.registerComponent('custom-rotation', {
+      schema: {
+        sensitivity: { type: 'number', default: 0.2 }, // Sensibilidad del movimiento
+        smoothness: { type: 'number', default: 0.2 }  // Controla la suavidad (0.01 = muy suave, 1 = instantáneo)
+      },
+      init: function () {
+        this.rotationY = 0; // Rotación actual en el eje Y
+        this.targetRotationY = 0; // Rotación objetivo (hacia donde queremos girar)
+        this.touchStartX = 0;
+        this.isDragging = false;
+
+        // Evento de inicio de toque
+        this.el.sceneEl.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) {
+            this.touchStartX = e.touches[0].pageX;
+            this.isDragging = true;
+          }
+        });
+
+        // Evento de movimiento de toque
+        this.el.sceneEl.addEventListener('touchmove', (e) => {
+          if (this.isDragging && e.touches.length === 1) {
+            const deltaX = e.touches[0].pageX - this.touchStartX;
+            this.targetRotationY += deltaX * this.data.sensitivity; // Actualizar rotación objetivo
+            this.touchStartX = e.touches[0].pageX;
+          }
+        });
+
+        // Evento de inicio de arrastre con mouse
+        this.el.sceneEl.addEventListener('mousedown', (e) => {
+          if (e.button === 0) { // Botón izquierdo
+            this.touchStartX = e.pageX;
+            this.isDragging = true;
+          }
+        });
+
+        // Evento de movimiento con mouse
+        this.el.sceneEl.addEventListener('mousemove', (e) => {
+          if (this.isDragging) {
+            const deltaX = e.pageX - this.touchStartX;
+            this.targetRotationY += deltaX * this.data.sensitivity; // Actualizar rotación objetivo
+            this.touchStartX = e.pageX;
+          }
+        });
+
+        // Detener el arrastre (tanto para touch como mouse)
+        this.el.sceneEl.addEventListener('mouseup', () => {
+          this.isDragging = false;
+        });
+        this.el.sceneEl.addEventListener('touchend', () => {
+          this.isDragging = false;
+        });
+      },
+      tick: function () {
+        // Interpolación suave entre la rotación actual y la rotación objetivo
+        if (this.rotationY !== this.targetRotationY) {
+          this.rotationY += (this.targetRotationY - this.rotationY) * this.data.smoothness;
+          this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
+        }
+      }
+    });
+  </script>
+  <script>
+    //Smooth movement
+    console.log('Ibera-AR version 0.4.1');
+  </script>
+</body>
+
 </html>
