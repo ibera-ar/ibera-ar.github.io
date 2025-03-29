@@ -7,23 +7,52 @@
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
   <style>
-    #sound-button {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      background: white;
-      border: 2px solid #ccc;
-      border-radius: 30px;
-      width: 50px;
-      height: 50px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      display: none;
+ #sound-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    width: 56px;
+    height: 56px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    border: none;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: fadeInButton 0.5s forwards;
+    display: none;
+
+  }
+
+  #sound-button.active {
+    background: #f0f8ff;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  #sound-button svg {
+    width: 28px;
+    height: 28px;
+    fill: #333;
+    transition: fill 0.3s ease;
+  }
+
+  #sound-button:hover svg {
+    fill: #007bff; /* Azul profesional */
+  }
+
+  @keyframes fadeInButton {
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
+  }
 
     .a-enter-vr-button {
       display: none;
@@ -82,17 +111,26 @@
 <body>
   <!-- Interfaz -->
   <!-- control de sonido -->
-  <button id="sound-button" onclick="toggleSound()">🔊</button>
+  <button id="sound-button" onclick="toggleSound()" aria-label="Toggle Sound">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <!-- Ícono de volumen -->
+      <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.22-.91 7-4.49 7-8.77s-2.78-7.86-7-8.77zM16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM3 9v6h4l5 5V4L7 9H3z"/>
+    </svg>
+  </button>
+  <!-- <button id="sound-button" onclick="toggleSound()">🔊</button> -->
   <!-- indicador de rotacion -->
   <div id="rotation-hint" class="hint-container">
     <img src="rotation.png" alt="Rotation" class="hint-icon">
   </div>
 
-  <!-- Debug MODE
+  <!-- Custom fun
+   force-webgl2 
    system-monitor 
    -->
   <a-scene mindar-image="imageTargetSrc: assets/targets.mind;" vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: true" id="ar-scene"      
+    device-orientation-permission-ui="enabled: true" id="ar-scene"   
+    force-webgl2 
+       
     >
 <!-- assets para cada target -->
     <a-assets> 
@@ -166,7 +204,6 @@
     <!-- <a-entity light="type: directional; color: #fff; intensity: 0.8" 
     position="-0.5 1 1" castShadow: true
     ></a-entity> -->
-    <!-- <a-entity cursor position="0 0 0"></a-entity>    -->
     <a-light type="ambient" color="#ffcc00" intensity="0.1"></a-light>
 
     <!-- Luz Spot 1 (Izquierda) -->
@@ -445,6 +482,8 @@
         // Ocultar elementos
         hint.style.display = 'none';
         soundButton.style.display = 'none';
+        soundButton.classList.remove('active'); // Resetear estado
+
 
         // Detener audio
         if (activeAudio) activeAudio.pause();
@@ -455,25 +494,31 @@
     }
 
     function toggleSound() {
-      if (!activeAudio) return;
+    const button = document.getElementById('sound-button');
+    if (activeAudio) {
       if (isPlaying) {
         activeAudio.pause();
+        button.classList.remove('active');
       } else {
         activeAudio.play();
+        button.classList.add('active');
       }
       isPlaying = !isPlaying;
     }
+  }
+ 
 
     // Forzar modo WebGL2 para mejor compatibilidad
     AFRAME.registerComponent('force-webgl2', {
       init: function () {
         if (this.el.sceneEl.renderer && this.el.sceneEl.renderer.capabilities.isWebGL2) {
+          console.log('WebGL2 Activated, baby!');
+
           this.el.sceneEl.renderer.outputEncoding = THREE.sRGBEncoding;
         }
       }
     });
-    // Aplicar a la escena
-    document.querySelector('a-scene').setAttribute('force-webgl2', '');
+
 
 
 
@@ -608,7 +653,7 @@
   </script>
   <script>
     //Smooth movement
-    console.log('Ibera-AR version 0.4.1');
+    console.log('Ibera-AR version 0.4.2');
   </script>
 </body>
 

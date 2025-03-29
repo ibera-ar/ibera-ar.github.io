@@ -6,24 +6,55 @@
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-  <style>
-    #sound-button {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      background: white;
-      border: 2px solid #ccc;
-      border-radius: 30px;
-      width: 50px;
-      height: 50px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      display: none;
+
+
+<style>
+ #sound-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    width: 56px;
+    height: 56px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    border: none;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: fadeInButton 0.5s forwards;
+    display: none;
+
+  }
+
+  #sound-button.active {
+    background: #f0f8ff;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  #sound-button svg {
+    width: 28px;
+    height: 28px;
+    fill: #333;
+    transition: fill 0.3s ease;
+  }
+
+  #sound-button:hover svg {
+    fill: #007bff; /* Azul profesional */
+  }
+
+  @keyframes fadeInButton {
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
+  }
 
     .a-enter-vr-button {
       display: none;
@@ -82,17 +113,25 @@
 <body>
   <!-- Interfaz -->
   <!-- control de sonido -->
-  <button id="sound-button" onclick="toggleSound()">🔊</button>
+  <button id="sound-button" onclick="toggleSound()" aria-label="Toggle Sound">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <!-- Ícono de volumen -->
+      <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.22-.91 7-4.49 7-8.77s-2.78-7.86-7-8.77zM16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM3 9v6h4l5 5V4L7 9H3z"/>
+    </svg>
+  </button>
+  <!-- <button id="sound-button" onclick="toggleSound()">🔊</button> -->
   <!-- indicador de rotacion -->
   <div id="rotation-hint" class="hint-container">
     <img src="rotation.png" alt="Rotation" class="hint-icon">
   </div>
 
-  <!-- Debug MODE
+  <!-- Custom fun
+   force-webgl2 
    system-monitor 
    -->
   <a-scene mindar-image="imageTargetSrc: assets/targets.mind;" vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: true" id="ar-scene"    
+    device-orientation-permission-ui="enabled: true" id="ar-scene"   
+    force-webgl2 
     system-monitor     
     >
 <!-- assets para cada target -->
@@ -167,7 +206,6 @@
     <!-- <a-entity light="type: directional; color: #fff; intensity: 0.8" 
     position="-0.5 1 1" castShadow: true
     ></a-entity> -->
-    <!-- <a-entity cursor position="0 0 0"></a-entity>    -->
     <a-light type="ambient" color="#ffcc00" intensity="0.1"></a-light>
 
     <!-- Luz Spot 1 (Izquierda) -->
@@ -304,313 +342,22 @@
   </a-scene>
 
   <script>
-
-    // Variables existentes
-    let isPlaying = false;
-    let activeAudio = null;
-    const soundButton = document.getElementById('sound-button');
-    const audios = Array.from({ length: 16 }, (_, i) => document.getElementById(`audio-${i}`));
-    const hint = document.getElementById('rotation-hint');
-
-    // PLAY // Animation
-    function playAnimation(targetEl) {
-      console.log('playAnimation function enabled');
-      console.log('Estructura del target:', targetEl);
-      console.log('Elementos con gltf-model:', targetEl.querySelectorAll('[gltf-model]'));
-      const modelEl = targetEl.querySelector('[gltf-model]');
-      console.log('Estructura del modelo:', modelEl.object3D);
-      console.log('Esqueleto encontrado:', modelEl.object3D.traverse(obj => {
-        if (obj.isBone) console.log('Hueso:', obj.name);
-      }));
-      if (!modelEl) {
-        console.error('⚠️ Modelo no encontrado en el target:', targetEl.id);
-        return;
-      }
-      const setupAnimation = () => {
-        const modelData = modelEl.components['gltf-model'];
-        // Obtener animaciones directamente del modelo
-        const animations = modelData.model.animations;
-        // Lógica para seleccionar la animación
-        const targetIndex = parseInt(targetEl.getAttribute('data-index'), 10);
-
-        if (animations.length === 0) {
-          console.warn(`⚠️ El modelo ${targetEl.id} no tiene animaciones.`);
-          return; // Salir sin intentar configurar animaciones
-        }
-
-
-        // Mostrar nombres de animaciones
-        console.log('Animaciones detectadas:', animations.map(a => a.name));
-        // Configurar animación
-        // const animationName = animations[0].name;
-        let animationName;
-
-        //Lógica para seleccionar la animación
-        if ([0, 4, 13].includes(targetIndex)) {
-          console.log('aguara guazu,ciervo o venado');
-
-          // Buscamos la animación "Idle_2"
-          const idleClip = animations.find(anim => anim.name === 'Idle_2_HeadLow');
-          // const idleClip = animations.find(anim => anim.name === 'Idle');
-
-          if (idleClip) {
-            console.log('Animacion encontrada, seteando');
-            animationName = 'Idle_2_HeadLow';
-          } else {
-            console.warn(`[Modelo ${targetIndex}] Animación Idle_2_HeadLow no encontrada. Usando: Idle_Headlow`);
-            animationName = 'Idle_Headlow';
-          }
-        } else {
-          console.log('diferente de targets');
-
-          // Comportamiento normal para otros modelos
-          animationName = animations[0].name;
-        }
-
-        console.log('Animaciones a asignar:', animationName);
-        modelEl.setAttribute('animation-mixer', {
-          clip: animationName,
-          loop: true,
-          timeScale: 1, //acelerar o ralentizar la animación.
-        });
-        console.log('asignado:', animationName);
-
-        setTimeout(() => {
-          const mixerComponent = modelEl.components['animation-mixer'];
-          if (mixerComponent?.mixer) {
-            // Buscar el clip por nombre
-            const clip = animations.find(anim => anim.name === animationName);
-            if (clip) {
-              const action = mixerComponent.mixer.clipAction(clip);
-              action.loop = THREE.LoopRepeat;
-              action.play();
-              console.log('▶️ Reproduciendo:', animationName);
-            }
-          }
-        }, 200);
-
-      };
-
-
-      // Verificar carga del modelo
-      if (modelEl.hasLoaded) {
-        console.log('modelo CARGADO');
-
-        setupAnimation();
-      } else {
-        console.log('modelo no cargado');
-        modelEl.addEventListener('model-loaded', setupAnimation, { once: true });
-      }
-    }
-
-    // STOP // Animation
-    // Aquí se remueve el componente para detenerla. A lo bruto
-    function stopAnimation(targetEl) {
-      const modelEl = targetEl.querySelector('[gltf-model]');
-      if (modelEl) {
-        console.log('Stop Animation in:', targetEl.id);
-
-        modelEl.removeAttribute('animation-mixer');
-      }
-    }
-
-    // Inicialización principal
-    document.querySelector('a-scene').addEventListener('loaded', () => {
-      document.querySelectorAll('[mindar-image-target]').forEach(initTargetListeners);
-    });
-
-    // Inicialización de listeners
-    function initTargetListeners(targetEl) {
-      console.log('Target Iniciado');
-                                                           // TARGET ENCONTRADO
-      targetEl.addEventListener('targetFound', () => {
-        console.log('Target found:', targetEl.id);
-        const idx = targetEl.getAttribute('data-index');
-        // Mostrar elementos
-        soundButton.style.display = 'flex';
-        hint.style.display = 'block';
-        hint.classList.add('hint-visible');
-
-        // Limpiar cualquier timer previo
-        clearTimeout(hint.timeout);
-        if (activeAudio && isPlaying) {
-          activeAudio.pause();
-          isPlaying = false;
-        }
-        activeAudio = audios[idx];
-        // reproducir la animación
-        playAnimation(targetEl);
-      });
-                                                      // TARGET PERDIDO
-      targetEl.addEventListener('targetLost', () => {
-        // Ocultar elementos
-        hint.style.display = 'none';
-        soundButton.style.display = 'none';
-
-        // Detener audio
-        if (activeAudio) activeAudio.pause();
-        // Detener animación
-        stopAnimation(targetEl);
-
-      });
-    }
-
-    function toggleSound() {
-      if (!activeAudio) return;
-      if (isPlaying) {
-        activeAudio.pause();
-      } else {
-        activeAudio.play();
-      }
-      isPlaying = !isPlaying;
-    }
-
-    // Forzar modo WebGL2 para mejor compatibilidad
     AFRAME.registerComponent('force-webgl2', {
       init: function () {
         if (this.el.sceneEl.renderer && this.el.sceneEl.renderer.capabilities.isWebGL2) {
+          console.log('WebGL2 Activated, baby!');
+
           this.el.sceneEl.renderer.outputEncoding = THREE.sRGBEncoding;
         }
       }
     });
-    // Aplicar a la escena
-    document.querySelector('a-scene').setAttribute('force-webgl2', '');
-
-
-
-    // // Debug MODE
-    AFRAME.registerComponent('system-monitor', {
-      schema: {
-        checkInterval: { type: 'number', default: 1000 }
-      },
-      init: function () {
-        this.frameCount = 0;
-        this.startTime = performance.now();
-        this.modelCheckInterval = null;
-        this.loadedModelCount = 0; // Contador de modelos cargados
-
-          // 1. Verificar si el panel existe
-          let debugPanel = document.querySelector('#debug-panel');
-
-              // 2. Si NO existe, crearlo
-              if (!debugPanel) {
-                debugPanel = document.createElement('div');
-                debugPanel.id = 'debug-panel';
-                debugPanel.className = 'debug-panel';
-                debugPanel.innerHTML = `
-                  <div>Modelos: <span id="loaded-count">0</span>/16</div>
-                  <div>FPS: <span id="fps">0</span></div>
-                  <div>Memoria: <span id="memory">N/A</span> MB</div>
-                `;
-                document.body.appendChild(debugPanel); // Agregar al DOM
-              }
-
-        // Escuchar eventos de carga de modelos
-        const modelEls = document.querySelectorAll('[gltf-model]');
-        modelEls.forEach(modelEl => {
-          modelEl.addEventListener('model-loaded', () => {
-            this.loadedModelCount++; // Incrementar contador cuando un modelo se carga
-            this.updateLoadedModelsDisplay(); // Actualizar el indicador
-          });
-        });
-      },
-      tick: function () {
-        // Medición de FPS
-        this.frameCount++;
-        const elapsed = performance.now() - this.startTime;
-        if (elapsed >= 1000) {
-          const fps = (this.frameCount / (elapsed / 1000)).toFixed(1);
-          document.getElementById('fps').textContent = fps;
-          // Reiniciar conteo
-          this.frameCount = 0;
-          this.startTime = performance.now();
-        }
-      },
-      update: function () {
-        // Iniciar intervalo para memoria
-        if (this.modelCheckInterval) clearInterval(this.modelCheckInterval);
-        this.modelCheckInterval = setInterval(() => {
-          // Medir memoria
-          if (performance.memory) {
-            const memory = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
-            document.getElementById('memory').textContent = memory;
-          }
-        }, this.data.checkInterval);
-      },
-      updateLoadedModelsDisplay: function () {
-        // Actualizar el indicador de modelos cargados
-        document.getElementById('loaded-count').textContent = this.loadedModelCount;
-      }
-    });
-
+        //Smooth movement
+        console.log('Ibera-AR version 0.4.4');
   </script>
-  <script>
-    AFRAME.registerComponent('custom-rotation', {
-      schema: {
-        sensitivity: { type: 'number', default: 0.2 }, // Sensibilidad del movimiento
-        smoothness: { type: 'number', default: 0.2 }  // Controla la suavidad (0.01 = muy suave, 1 = instantáneo)
-      },
-      init: function () {
-        this.rotationY = 0; // Rotación actual en el eje Y
-        this.targetRotationY = 0; // Rotación objetivo (hacia donde queremos girar)
-        this.touchStartX = 0;
-        this.isDragging = false;
-
-        // Evento de inicio de toque
-        this.el.sceneEl.addEventListener('touchstart', (e) => {
-          if (e.touches.length === 1) {
-            this.touchStartX = e.touches[0].pageX;
-            this.isDragging = true;
-          }
-        });
-
-        // Evento de movimiento de toque
-        this.el.sceneEl.addEventListener('touchmove', (e) => {
-          if (this.isDragging && e.touches.length === 1) {
-            const deltaX = e.touches[0].pageX - this.touchStartX;
-            this.targetRotationY += deltaX * this.data.sensitivity; // Actualizar rotación objetivo
-            this.touchStartX = e.touches[0].pageX;
-          }
-        });
-
-        // Evento de inicio de arrastre con mouse
-        this.el.sceneEl.addEventListener('mousedown', (e) => {
-          if (e.button === 0) { // Botón izquierdo
-            this.touchStartX = e.pageX;
-            this.isDragging = true;
-          }
-        });
-
-        // Evento de movimiento con mouse
-        this.el.sceneEl.addEventListener('mousemove', (e) => {
-          if (this.isDragging) {
-            const deltaX = e.pageX - this.touchStartX;
-            this.targetRotationY += deltaX * this.data.sensitivity; // Actualizar rotación objetivo
-            this.touchStartX = e.pageX;
-          }
-        });
-
-        // Detener el arrastre (tanto para touch como mouse)
-        this.el.sceneEl.addEventListener('mouseup', () => {
-          this.isDragging = false;
-        });
-        this.el.sceneEl.addEventListener('touchend', () => {
-          this.isDragging = false;
-        });
-      },
-      tick: function () {
-        // Interpolación suave entre la rotación actual y la rotación objetivo
-        if (this.rotationY !== this.targetRotationY) {
-          this.rotationY += (this.targetRotationY - this.rotationY) * this.data.smoothness;
-          this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
-        }
-      }
-    });
-  </script>
-  <script>
-    //Smooth movement
-    console.log('Ibera-AR version 0.4.1');
-  </script>
+  <script src="lib/system_monitor.js"></script>
+  <script src="lib/rotation.js"></script>
+  <script src="lib/animations.js"></script>
+  <script src="lib/main.js"></script>
 </body>
 
 </html>
