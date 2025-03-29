@@ -195,6 +195,10 @@
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
+        animation__position="property: position; from: 0 0 -1; to: 0 0 0; dur: 1000; easing: easeInOutQuad; startEvents: targetFound"
+        animation__fadein="property: opacity; from: 0; to: 1; dur: 1000; easing: easeInOutQuad; startEvents: targetFound"
+        animation__fadeout="property: opacity; from: 1; to: 0; dur: 1000; easing: easeInOutQuad; startEvents: targetLost"
+     
         ></a-entity>
       </a-entity>
       
@@ -228,6 +232,8 @@
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
+        smooth-position="targetPosition: 0 0 0; smoothness: 0.05"
+
         ></a-entity>     
       </a-entity>  
       
@@ -414,7 +420,7 @@
     modelEl.setAttribute('animation-mixer', {
       clip: animationName,
       loop: true,
-      timeScale: 1,
+      timeScale: 1, //acelerar o ralentizar la animación.
   });
   console.log('asignado:', animationName);
 
@@ -603,7 +609,7 @@ AFRAME.registerComponent('system-monitor', {
 // document.querySelector('a-scene').setAttribute('system-monitor', '');
 
 
-  console.log('Ibera-AR version 0.3.8');
+  console.log('Ibera-AR version 0.4.0');
 
  </script> 
  <script>
@@ -671,54 +677,26 @@ AFRAME.registerComponent('custom-rotation', {
   }
 });
 
-  // AFRAME.registerComponent('custom-rotation', {
-  //   schema: {
-  //     sensitivity: { type: 'number', default: 0.2 } // Ajusta la sensibilidad
-  //   },
-  //   init: function () {
-  //     this.rotationY = 0;
-  //     this.touchStartX = 0;
-
-  //     this.el.sceneEl.addEventListener('touchstart', (e) => {
-  //       if (e.touches.length === 1) {
-  //             this.touchStartX = e.touches[0].pageX;
-  //       }
-  //     });
-
-  //     this.el.sceneEl.addEventListener('touchmove', (e) => {
-  //       if (e.touches.length === 1) {
-  //             const deltaX = e.touches[0].pageX - this.touchStartX;
-  //             this.rotationY += deltaX * this.data.sensitivity;
-              
-  //             // Aplicar rotación solo en el eje Y
-  //             this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
-  //             // Actualizar posición inicial para el próximo movimiento
-  //             this.touchStartX = e.touches[0].pageX;
-  //         }
-  //       });
-  //     // Detectar evento de mouse
-  //     this.el.sceneEl.addEventListener('mousedown', (e) => {
-  //       if (e.button === 0) { // Botón izquierdo
-  //             this.touchStartX = e.pageX;
-  //             this.isDragging = true;
-  //         }
-  //       });
-  //     this.el.sceneEl.addEventListener('mousemove', (e) => {
-  //       if (this.isDragging) {
-  //             const deltaX = e.pageX - this.touchStartX;
-  //             this.rotationY += deltaX * this.data.sensitivity;
-  //             this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
-  //             this.touchStartX = e.pageX;
-  //         }
-  //       });
-  //     this.el.sceneEl.addEventListener('mouseup', () => {
-  //             this.isDragging = false;
-  //       });
-  //     }
-  // });
-
-
 
 </script> 
+<script>AFRAME.registerComponent('smooth-position', {
+  schema: {
+    targetPosition: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
+    smoothness: { type: 'number', default: 0.1 }
+  },
+  init: function () {
+    this.currentPosition = new THREE.Vector3();
+  },
+  tick: function () {
+    const targetPosition = new THREE.Vector3(
+      this.data.targetPosition.x,
+      this.data.targetPosition.y,
+      this.data.targetPosition.z
+    );
+    this.currentPosition.lerp(targetPosition, this.data.smoothness);
+    this.el.object3D.position.copy(this.currentPosition);
+  }
+});
+</script>
   </body>
 </html>
