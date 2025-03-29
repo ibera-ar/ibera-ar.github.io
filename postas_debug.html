@@ -71,7 +71,7 @@
   font-family: monospace;
   z-index: 9999;
 ">
-  <div>Modelos cargados: <span id="loaded-count">0</span>/16</div>
+  <!-- <div>Modelos cargados: <span id="loaded-count">0</span>/16</div> -->
   <div>FPS: <span id="fps">0</span></div>
   <div>MEM: <span id="memory">0</span></div>
 
@@ -323,40 +323,44 @@
     return;
     }
     const setupAnimation = () => {
-    const modelData = modelEl.components['gltf-model'];
-    // Obtener animaciones directamente del modelo
-    const animations = modelData.model.animations;
-    // Lógica para seleccionar la animación
-    const targetIndex = parseInt(targetEl.getAttribute('data-index'), 10); 
+        const modelData = modelEl.components['gltf-model'];
+        // Obtener animaciones directamente del modelo
+        const animations = modelData.model.animations;
+        // Lógica para seleccionar la animación
+        const targetIndex = parseInt(targetEl.getAttribute('data-index'), 10); 
 
-    // Mostrar nombres de animaciones
-    console.log('Animaciones detectadas:', animations.map(a => a.name));
-    // Configurar animación
-    // const animationName = animations[0].name;
-    let animationName;
+        // Mostrar nombres de animaciones
+        console.log('Animaciones detectadas:', animations.map(a => a.name));
+        // Configurar animación
+        // const animationName = animations[0].name;
+        let animationName;
 
     // Lógica para seleccionar la animación
+    // if ([0, 4, 13].includes(targetIndex)) {
+    //   console.log('aguara guazu,ciervo o venado');
+
+    //       // Buscamos la animación "Idle_2"
+    //       const idleClip = animations.find(anim => anim.name === 'Idle_2_HeadLow');
+    //       // const idleClip = animations.find(anim => anim.name === 'Idle');
+
+    //       if (idleClip) {
+    //         console.log('Animacion encontrada, seteando');
+    //         animationName = 'Idle_2_HeadLow';
+    //       } else {
+    //         console.warn(`[Modelo ${targetIndex}] Animación Idle_2 no encontrada. Usando:`, animations[0]?.name);
+    //         animationName = animations[0].name;
+    //       }
+    //     } else {
+    //       console.log('diferente de targets');
+
+    //       // Comportamiento normal para otros modelos
+    //       animationName = animations[0].name;
+    //     }
     if ([0, 4, 13].includes(targetIndex)) {
       console.log('aguara guazu,ciervo o venado');
-
-          // Buscamos la animación "Idle_2"
-          const idleClip = animations.find(anim => anim.name === 'Idle_2_HeadLow');
-          // const idleClip = animations.find(anim => anim.name === 'Idle');
-
-          if (idleClip) {
-            console.log('Animacion encontrada, seteando');
-            animationName = 'Idle_2_HeadLow';
-          } else {
-            console.warn(`[Modelo ${targetIndex}] Animación Idle_2 no encontrada. Usando:`, animations[0]?.name);
-            animationName = animations[0].name;
-          }
-        } else {
-          console.log('diferente de targets');
-
-          // Comportamiento normal para otros modelos
-          animationName = animations[0].name;
-        }
-
+        const idleClip = animations.find(anim => anim.name === 'Idle_2_HeadLow');
+        animationName = idleClip ? 'Idle_2_HeadLow' : animationName;
+      }
 
     console.log('Animaciones a asignar:', animationName);
     modelEl.setAttribute('animation-mixer', {
@@ -450,6 +454,7 @@
       if (activeAudio) activeAudio.pause();
       // Detener animación
       stopAnimation(targetEl); // <-- Descomentado
+
     });
   }
     // targetEl.addEventListener('targetLost', () => {
@@ -576,65 +581,65 @@
   //   }
   // });
 
-// Componente de monitoreo completo
-AFRAME.registerComponent('system-monitor', {
-  schema: {
-    checkInterval: { type: 'number', default: 1000 }
-  },
+// // Componente de monitoreo completo
+// AFRAME.registerComponent('system-monitor', {
+//   schema: {
+//     checkInterval: { type: 'number', default: 1000 }
+//   },
   
-  init: function () {
-    this.frameCount = 0;
-    this.startTime = performance.now();
-    this.modelCheckInterval = null;
+//   init: function () {
+//     this.frameCount = 0;
+//     this.startTime = performance.now();
+//     this.modelCheckInterval = null;
     
-    // Crear elementos del panel si no existen
-    this.debugPanel = document.getElementById('debug-panel');
-    if (!this.debugPanel) {
-      this.debugPanel = document.createElement('div');
-      this.debugPanel.id = 'debug-panel';
-      this.debugPanel.innerHTML = `
-        <div>Modelos: <span id="loaded-count">0</span>/16</div>
-        <div>FPS: <span id="fps">0</span></div>
-        <div>Memoria: <span id="memory">N/A</span> MB</div>
-      `;
-      document.body.appendChild(this.debugPanel);
-    }
-  },
+//     // Crear elementos del panel si no existen
+//     this.debugPanel = document.getElementById('debug-panel');
+//     if (!this.debugPanel) {
+//       this.debugPanel = document.createElement('div');
+//       this.debugPanel.id = 'debug-panel';
+//       this.debugPanel.innerHTML = `
+//         <div>Modelos: <span id="loaded-count">0</span>/16</div>
+//         <div>FPS: <span id="fps">0</span></div>
+//         <div>Memoria: <span id="memory">N/A</span> MB</div>
+//       `;
+//       document.body.appendChild(this.debugPanel);
+//     }
+//   },
 
-  tick: function () {
-    // Medición de FPS
-    this.frameCount++;
-    const elapsed = performance.now() - this.startTime;
+//   tick: function () {
+//     // Medición de FPS
+//     this.frameCount++;
+//     const elapsed = performance.now() - this.startTime;
 
-    if (elapsed >= 1000) {
-      const fps = (this.frameCount / (elapsed / 1000)).toFixed(1);
-      document.getElementById('fps').textContent = fps;
+//     if (elapsed >= 1000) {
+//       const fps = (this.frameCount / (elapsed / 1000)).toFixed(1);
+//       document.getElementById('fps').textContent = fps;
       
-      // Reiniciar conteo
-      this.frameCount = 0;
-      this.startTime = performance.now();
-    }
-  },
+//       // Reiniciar conteo
+//       this.frameCount = 0;
+//       this.startTime = performance.now();
+//     }
+//   },
 
-  update: function () {
-    // Iniciar intervalo para modelos y memoria
-    if (this.modelCheckInterval) clearInterval(this.modelCheckInterval);
+//   update: function () {
+//     // Iniciar intervalo para modelos y memoria
+//     if (this.modelCheckInterval) clearInterval(this.modelCheckInterval);
     
-    this.modelCheckInterval = setInterval(() => {
-      // Contar modelos cargados
-      const loadedModels = Array.from(document.querySelectorAll('[gltf-model]'))
-        .filter(el => el.components['gltf-model']?.loaded)
-        .length;
-      document.getElementById('loaded-count').textContent = loadedModels;
+//     this.modelCheckInterval = setInterval(() => {
+//       // Contar modelos cargados
+//       const loadedModels = Array.from(document.querySelectorAll('[gltf-model]'))
+//         .filter(el => el.components['gltf-model']?.loaded)
+//         .length;
+//       document.getElementById('loaded-count').textContent = loadedModels;
 
-      // Medir memoria
-      if (performance.memory) {
-        const memory = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
-        document.getElementById('memory').textContent = memory;
-      }
-    }, this.data.checkInterval);
-  }
-});
+//       // Medir memoria
+//       if (performance.memory) {
+//         const memory = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
+//         document.getElementById('memory').textContent = memory;
+//       }
+//     }, this.data.checkInterval);
+//   }
+// });
 
 // Aplicar a la escena
 document.querySelector('a-scene').setAttribute('system-monitor', '');
@@ -687,11 +692,6 @@ document.querySelector('a-scene').setAttribute('system-monitor', '');
       this.el.sceneEl.addEventListener('mouseup', () => {
               this.isDragging = false;
         });
-
-
-
-
-
       }
   });
 
