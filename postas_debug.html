@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>  
     
     <style>
+
       #sound-button {
         position: fixed;
         top: 20px;
@@ -36,7 +37,7 @@
           opacity: 0;
           transition: opacity 0.3s ease;
           pointer-events: none;
-          z-index: 9998;
+          /* z-index: 9998; */
         }
 
         .hint-icon {
@@ -89,7 +90,7 @@
       vr-mode-ui="enabled: false" 
       device-orientation-permission-ui="enabled: true"
       id="ar-scene"    
-      fps-counter >
+      system-monitor>
       <a-assets timeout="10000">     <!-- assets para cada target -->
         <!-- 0: aguaraguazu -->
         <a-asset-item id="model-0" src="assets/aguaraguazu.glb" ></a-asset-item>
@@ -162,8 +163,32 @@
     position="-0.5 1 1" castShadow: true
     ></a-entity> -->
     <!-- <a-entity cursor position="0 0 0"></a-entity>    -->
-    <a-light type="ambient" color="#ffffff" intensity="0.3"></a-light>
-      <!-- entidades para cada target -->      
+    <a-light type="ambient" color="#ffcc00" intensity="0.1"></a-light>
+ 
+    <!-- Luz Spot 1 (Izquierda) -->
+         <a-entity light 
+         type="spot" 
+         color="##ffcc00" 
+         intensity="0.1" 
+         position="-1 2 0" 
+         rotation="-90 0 0" 
+         angle="45" 
+         penumbra="0.5" 
+         decay="2">
+     </a-entity> 
+       
+       <!-- Luz Spot 2 (Derecha) -->
+     <!--    <a-entity light 
+       type="spot" 
+         color="##ffcc00" 
+         intensity="0.1" 
+         position="1 2 0" 
+         rotation="-90 0 0" 
+         angle="45" 
+         penumbra="0.5" 
+         decay="2">
+        </a-entity> -->
+        <!-- entidades para cada target -->      
       <!-- 0: aguaraguazu -->
       <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
         <a-entity gltf-model="#model-0" scale="0.15 0.15 0.15" 
@@ -171,65 +196,50 @@
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
         ></a-entity>
-         <!-- Luz Spot 1 (Izquierda) -->
-  <a-light 
-  type="spot" 
-  color="##ffcc00" 
-  intensity="1" 
-  position="-1 2 0" 
-  rotation="-90 0 0" 
-  angle="45" 
-  penumbra="0.5" 
-  decay="2">
-</a-light>
-
-<!-- Luz Spot 2 (Derecha) -->
-<a-light 
-  type="spot" 
-  color="##ffcc00" 
-  intensity="1" 
-  position="1 2 0" 
-  rotation="-90 0 0" 
-  angle="45" 
-  penumbra="0.5" 
-  decay="2">
-</a-light>
       </a-entity>
       
       <!-- 1: boacuriyu -->
       <a-entity mindar-image-target="targetIndex: 1" data-index="1" id="target-1">
+         
         <a-entity gltf-model="#model-1" scale="0.03 0.03 0.03" 
         position="0 0 0" 
         rotation="45 15 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>
+        >
+      </a-entity>  
+
       </a-entity>
 
       <!-- 2: caraya -->
       <a-entity mindar-image-target="targetIndex: 2" data-index="2" id="target-2">
+         
         <a-entity gltf-model="#model-2" scale="0.1 0.1 0.1" 
         position="0 0 0" 
         rotation="0 0 0" 
         custom-rotation="sensitivity: 0.2"  
         >
       </a-entity>
-      </a-entity>
+    </a-entity>  
       
       <!-- 3: carpincho -->
       <a-entity mindar-image-target="targetIndex: 3" data-index="3" id="target-3">
+         
         <a-entity gltf-model="#model-3" scale="0.7 0.7 0.7" 
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>     
+      </a-entity>  
       
       <!-- 4: ciervo -->
       <a-entity mindar-image-target="targetIndex: 4" data-index="4" id="target-4">
+
         <a-entity gltf-model="#model-4" scale="0.1 0.1 0.1" 
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>    
+      </a-entity>  
       
       <!-- 5: dorado -->
       <a-entity mindar-image-target="targetIndex: 5" data-index="5" id="target-5">
@@ -237,7 +247,8 @@
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>     
+      </a-entity>  
       
       <!-- 6: jabiru -->
       <a-entity mindar-image-target="targetIndex: 6" data-index="6" id="target-6">
@@ -245,7 +256,8 @@
         position="0 -0.2 0" 
         rotation="0 0 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>    
+      </a-entity>  
       
       <!-- 7: jacana -->
       <a-entity mindar-image-target="targetIndex: 7" data-index="7" id="target-7">
@@ -253,7 +265,8 @@
         position="0 -0.2 -0.2" 
         rotation="0 0 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>    
+      </a-entity>  
       
       <!-- 8: jaguarete -->
       <a-entity mindar-image-target="targetIndex: 8" data-index="8" id="target-8">
@@ -261,7 +274,8 @@
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>     
+      </a-entity>  
       
       <!-- 9: nutria -->
       <a-entity mindar-image-target="targetIndex: 9" data-index="9" id="target-9">
@@ -269,15 +283,18 @@
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>    
+      </a-entity>  
       
       <!-- 10: osohormiguero -->
       <a-entity mindar-image-target="targetIndex: 10" data-index="10" id="target-10">
+         
         <a-entity gltf-model="#model-10" scale="0.15 0.15 0.15" 
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>     
+      </a-entity>  
       
       <!-- 11: tararira -->
       <a-entity mindar-image-target="targetIndex: 11" data-index="11" id="target-11">
@@ -285,7 +302,8 @@
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>    
+      </a-entity>  
       
       <!-- 12: tordo -->
       <a-entity mindar-image-target="targetIndex: 12" data-index="12" id="target-12">
@@ -293,32 +311,39 @@
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>  
+      </a-entity>  
       
       <!-- 13: venado -->
       <a-entity mindar-image-target="targetIndex: 13" data-index="13" id="target-13">
+
         <a-entity gltf-model="#model-13" scale="0.15 0.15 0.15" 
         position="0 -0.2 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>    
+      </a-entity>  
       
       <!-- 14: yacare -->
       <a-entity mindar-image-target="targetIndex: 14" data-index="14" id="target-14">
+
         <a-entity gltf-model="#model-14" scale="0.28 0.28 0.28" 
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
-        ></a-entity>      </a-entity>
+        ></a-entity>    
+      </a-entity>  
       
       <!-- 15: yetapa -->
       <a-entity mindar-image-target="targetIndex: 15" data-index="15" id="target-15">
+
         <a-entity gltf-model="#model-15" scale="0.6 0.6 0.6" 
         position="0 0 0" 
         rotation="0 -90 0" 
         custom-rotation="sensitivity: 0.2"  
         ></a-entity>      
-      </a-entity>
+
+    </a-entity>  
 
       <a-camera id="camera" position="0 0 0" look-controls="enabled: false"></a-camera>
     </a-scene>
@@ -408,9 +433,12 @@
 }, 200);
 
   };
+
+
   // Verificar carga del modelo
   if (modelEl.hasLoaded) {
     console.log('modelo CARGADO');
+
     setupAnimation();
   } else {
     console.log('modelo no cargado');
@@ -445,7 +473,7 @@
 
 // Inicialización de listeners
   function initTargetListeners(targetEl) {
-    console.log('initTargetListeners init');
+    console.log('target individual iniciado');
                                         // TARGET ENCONTRADO
     targetEl.addEventListener('targetFound', () => {
           console.log('Target found:', targetEl.id);
@@ -454,7 +482,8 @@
           soundButton.style.display = 'flex';
           hint.style.display = 'block';
           hint.classList.add('hint-visible');
-    // Limpiar cualquier timer previo
+
+          // Limpiar cualquier timer previo
     clearTimeout(hint.timeout);
           if (activeAudio && isPlaying) {
             activeAudio.pause();
@@ -467,35 +496,23 @@
                                         // TARGET PERDIDO
       targetEl.addEventListener('targetLost', () => {
       // Ocultar elementos
+
+
+  // Espera a que termine la animación antes de ocultar elementos
+  setTimeout(() => {
+    hint.style.display = 'none';
+    soundButton.style.display = 'none';
+  }, 1000); // Duración del fadeout
+  
       hint.style.display = 'none';
       soundButton.style.display = 'none';
       // Detener audio
       if (activeAudio) activeAudio.pause();
       // Detener animación
-      stopAnimation(targetEl); // <-- Descomentado
+      stopAnimation(targetEl); 
 
     });
   }
-
-    // FUNCIONES DE FADE
-    // targetEl.addEventListener('targetLost', () => {
-    //       console.log('Target lost:', targetEl.id);
-
-    //       hint.classList.remove('hint-visible');
-    //       hint.timeout = setTimeout(() => {
-    //       hint.style.display = 'none';
-    //       }, 300); // Duración de la transición
-
-    //       if (activeAudio && isPlaying) {
-    //         activeAudio.pause();
-    //         isPlaying = false;
-    //       }
-    //       soundButton.style.display = 'none';
-
-    //       // detener la animación
-    //       stopAnimation(targetEl);
-    //       });
-    //   }
 
       function toggleSound() {
         if (!activeAudio) return;
@@ -520,17 +537,17 @@
   
 
 
-// Componente de monitoreo
+// // Debug MODE
 AFRAME.registerComponent('system-monitor', {
   schema: {
     checkInterval: { type: 'number', default: 1000 }
   },
-  
   init: function () {
     this.frameCount = 0;
     this.startTime = performance.now();
     this.modelCheckInterval = null;
-    
+    this.loadedModelCount = 0; // Contador de modelos cargados
+
     // Crear elementos del panel si no existen
     this.debugPanel = document.getElementById('debug-panel');
     if (!this.debugPanel) {
@@ -543,96 +560,162 @@ AFRAME.registerComponent('system-monitor', {
       `;
       document.body.appendChild(this.debugPanel);
     }
-  },
 
+    // Escuchar eventos de carga de modelos
+    const modelEls = document.querySelectorAll('[gltf-model]');
+    modelEls.forEach(modelEl => {
+      modelEl.addEventListener('model-loaded', () => {
+        this.loadedModelCount++; // Incrementar contador cuando un modelo se carga
+        this.updateLoadedModelsDisplay(); // Actualizar el indicador
+      });
+    });
+  },
   tick: function () {
     // Medición de FPS
     this.frameCount++;
     const elapsed = performance.now() - this.startTime;
-
     if (elapsed >= 1000) {
       const fps = (this.frameCount / (elapsed / 1000)).toFixed(1);
       document.getElementById('fps').textContent = fps;
-      
       // Reiniciar conteo
       this.frameCount = 0;
       this.startTime = performance.now();
     }
   },
-
   update: function () {
-    // Iniciar intervalo para modelos y memoria
+    // Iniciar intervalo para memoria
     if (this.modelCheckInterval) clearInterval(this.modelCheckInterval);
-    
     this.modelCheckInterval = setInterval(() => {
-      // Contar modelos cargados
-      const loadedModels = Array.from(document.querySelectorAll('[gltf-model]'))
-        .filter(el => el.components['gltf-model']?.loaded)
-        .length;
-      document.getElementById('loaded-count').textContent = loadedModels;
-
       // Medir memoria
       if (performance.memory) {
         const memory = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
         document.getElementById('memory').textContent = memory;
       }
     }, this.data.checkInterval);
+  },
+  updateLoadedModelsDisplay: function () {
+    // Actualizar el indicador de modelos cargados
+    document.getElementById('loaded-count').textContent = this.loadedModelCount;
   }
 });
 
 // Aplicar a la escena
-document.querySelector('a-scene').setAttribute('system-monitor', '');
+// document.querySelector('a-scene').setAttribute('system-monitor', '');
 
 
-  console.log('Ibera-AR version 0.3.6');
+  console.log('Ibera-AR version 0.3.8');
 
  </script> 
  <script>
-  AFRAME.registerComponent('custom-rotation', {
-    schema: {
-      sensitivity: { type: 'number', default: 0.2 } // Ajusta la sensibilidad
-    },
-    init: function () {
-      this.rotationY = 0;
-      this.touchStartX = 0;
 
-      this.el.sceneEl.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
-              this.touchStartX = e.touches[0].pageX;
-        }
-      });
 
-      this.el.sceneEl.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 1) {
-              const deltaX = e.touches[0].pageX - this.touchStartX;
-              this.rotationY += deltaX * this.data.sensitivity;
-              
-              // Aplicar rotación solo en el eje Y
-              this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
-              // Actualizar posición inicial para el próximo movimiento
-              this.touchStartX = e.touches[0].pageX;
-          }
-        });
-      // Detectar evento de mouse
-      this.el.sceneEl.addEventListener('mousedown', (e) => {
-        if (e.button === 0) { // Botón izquierdo
-              this.touchStartX = e.pageX;
-              this.isDragging = true;
-          }
-        });
-      this.el.sceneEl.addEventListener('mousemove', (e) => {
-        if (this.isDragging) {
-              const deltaX = e.pageX - this.touchStartX;
-              this.rotationY += deltaX * this.data.sensitivity;
-              this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
-              this.touchStartX = e.pageX;
-          }
-        });
-      this.el.sceneEl.addEventListener('mouseup', () => {
-              this.isDragging = false;
-        });
+AFRAME.registerComponent('custom-rotation', {
+  schema: {
+    sensitivity: { type: 'number', default: 0.2 }, // Sensibilidad del movimiento
+    smoothness: { type: 'number', default: 0.2 }  // Controla la suavidad (0.01 = muy suave, 1 = instantáneo)
+  },
+  init: function () {
+    this.rotationY = 0; // Rotación actual en el eje Y
+    this.targetRotationY = 0; // Rotación objetivo (hacia donde queremos girar)
+    this.touchStartX = 0;
+    this.isDragging = false;
+
+    // Evento de inicio de toque
+    this.el.sceneEl.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        this.touchStartX = e.touches[0].pageX;
+        this.isDragging = true;
       }
-  });
+    });
+
+    // Evento de movimiento de toque
+    this.el.sceneEl.addEventListener('touchmove', (e) => {
+      if (this.isDragging && e.touches.length === 1) {
+        const deltaX = e.touches[0].pageX - this.touchStartX;
+        this.targetRotationY += deltaX * this.data.sensitivity; // Actualizar rotación objetivo
+        this.touchStartX = e.touches[0].pageX;
+      }
+    });
+
+    // Evento de inicio de arrastre con mouse
+    this.el.sceneEl.addEventListener('mousedown', (e) => {
+      if (e.button === 0) { // Botón izquierdo
+        this.touchStartX = e.pageX;
+        this.isDragging = true;
+      }
+    });
+
+    // Evento de movimiento con mouse
+    this.el.sceneEl.addEventListener('mousemove', (e) => {
+      if (this.isDragging) {
+        const deltaX = e.pageX - this.touchStartX;
+        this.targetRotationY += deltaX * this.data.sensitivity; // Actualizar rotación objetivo
+        this.touchStartX = e.pageX;
+      }
+    });
+
+    // Detener el arrastre (tanto para touch como mouse)
+    this.el.sceneEl.addEventListener('mouseup', () => {
+      this.isDragging = false;
+    });
+    this.el.sceneEl.addEventListener('touchend', () => {
+      this.isDragging = false;
+    });
+  },
+  tick: function () {
+    // Interpolación suave entre la rotación actual y la rotación objetivo
+    if (this.rotationY !== this.targetRotationY) {
+      this.rotationY += (this.targetRotationY - this.rotationY) * this.data.smoothness;
+      this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
+    }
+  }
+});
+
+  // AFRAME.registerComponent('custom-rotation', {
+  //   schema: {
+  //     sensitivity: { type: 'number', default: 0.2 } // Ajusta la sensibilidad
+  //   },
+  //   init: function () {
+  //     this.rotationY = 0;
+  //     this.touchStartX = 0;
+
+  //     this.el.sceneEl.addEventListener('touchstart', (e) => {
+  //       if (e.touches.length === 1) {
+  //             this.touchStartX = e.touches[0].pageX;
+  //       }
+  //     });
+
+  //     this.el.sceneEl.addEventListener('touchmove', (e) => {
+  //       if (e.touches.length === 1) {
+  //             const deltaX = e.touches[0].pageX - this.touchStartX;
+  //             this.rotationY += deltaX * this.data.sensitivity;
+              
+  //             // Aplicar rotación solo en el eje Y
+  //             this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
+  //             // Actualizar posición inicial para el próximo movimiento
+  //             this.touchStartX = e.touches[0].pageX;
+  //         }
+  //       });
+  //     // Detectar evento de mouse
+  //     this.el.sceneEl.addEventListener('mousedown', (e) => {
+  //       if (e.button === 0) { // Botón izquierdo
+  //             this.touchStartX = e.pageX;
+  //             this.isDragging = true;
+  //         }
+  //       });
+  //     this.el.sceneEl.addEventListener('mousemove', (e) => {
+  //       if (this.isDragging) {
+  //             const deltaX = e.pageX - this.touchStartX;
+  //             this.rotationY += deltaX * this.data.sensitivity;
+  //             this.el.object3D.rotation.y = THREE.MathUtils.degToRad(this.rotationY);
+  //             this.touchStartX = e.pageX;
+  //         }
+  //       });
+  //     this.el.sceneEl.addEventListener('mouseup', () => {
+  //             this.isDragging = false;
+  //       });
+  //     }
+  // });
 
 
 
