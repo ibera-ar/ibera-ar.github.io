@@ -6,111 +6,17 @@
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-
-
-<style>
- #sound-button {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-    width: 56px;
-    height: 56px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    outline: none;
-    border: none;
-    opacity: 0;
-    transform: translateY(-20px);
-    animation: fadeInButton 0.5s forwards;
-    display: none;
-
-  }
-
-  #sound-button.active {
-    background: #f0f8ff;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  #sound-button svg {
-    width: 28px;
-    height: 28px;
-    fill: #333;
-    transition: fill 0.3s ease;
-  }
-
-  #sound-button:hover svg {
-    fill: #007bff; /* Azul profesional */
-  }
-
-  @keyframes fadeInButton {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-    .a-enter-vr-button {
-      display: none;
-    }
-
-    .hint-container {
-      position: fixed;
-      bottom: 10%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-      /* z-index: 9998; */
-    }
-
-    .hint-icon {
-      width: 64px;
-      height: 64px;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.1);
-      }
-
-      100% {
-        transform: scale(1);
-      }
-    }
-
-    /* Efecto de fade */
-    .hint-visible {
-      opacity: 1 !important;
-    }
-
-    .debug-panel {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 10px;
-      border-radius: 8px;
-      font-family: monospace;
-      z-index: 9999;
-    } 
-  </style>
+  <link href="style.css" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
+
+  <!-- Pantalla de Carga -->
+  <div id="splash-screen">
+    <div id="loading-text" style="color: white; font-size: 24px; margin-bottom: 20px;">
+      Cargando experiencia...
+    </div>
+    </div>
   <!-- Interfaz -->
   <!-- control de sonido -->
   <button id="sound-button" onclick="toggleSound()" aria-label="Toggle Sound">
@@ -119,13 +25,11 @@
       <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.22-.91 7-4.49 7-8.77s-2.78-7.86-7-8.77zM16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM3 9v6h4l5 5V4L7 9H3z"/>
     </svg>
   </button>
-  <!-- <button id="sound-button" onclick="toggleSound()">🔊</button> -->
   <!-- indicador de rotacion -->
   <div id="rotation-hint" class="hint-container">
     <img src="rotation.png" alt="Rotation" class="hint-icon">
   </div>
-
-  <!-- Custom fun
+  <!-- Custom 
    force-webgl2 
    system-monitor 
    -->
@@ -134,98 +38,63 @@
     force-webgl2 
     system-monitor     
     >
-<!-- assets para cada target -->
+                            <!-- assets para cada target -->
     <a-assets> 
       <!-- 0: aguaraguazu -->
-      <a-asset-item id="model-0" src="assets/aguaraguazu.glb"></a-asset-item>
-      <audio id="audio-0" src="assets/aguaraguazu.mp3" loop></audio>
-
+      <a-asset-item id="model-0" src="assets/aguaraguazu.glb" ></a-asset-item>
       <!-- 1: boacuriyu -->
       <a-asset-item id="model-1" src="assets/boacuriyu.glb"></a-asset-item>
-      <audio id="audio-1" src="assets/boacuriyu.mp3" loop></audio>
-
       <!-- 2: caraya -->
       <a-asset-item id="model-2" src="assets/caraya.glb"></a-asset-item>
-      <audio id="audio-2" src="assets/caraya.mp3" loop></audio>
-
       <!-- 3: carpincho -->
       <a-asset-item id="model-3" src="assets/carpincho.glb"></a-asset-item>
-      <audio id="audio-3" src="assets/carpincho.mp3" loop></audio>
-
       <!-- 4: ciervo -->
       <a-asset-item id="model-4" src="assets/ciervo.glb"></a-asset-item>
-      <audio id="audio-4" src="assets/ciervo.mp3" loop></audio>
-
       <!-- 5: dorado -->
       <a-asset-item id="model-5" src="assets/dorado.glb"></a-asset-item>
-      <audio id="audio-5" src="assets/dorado.mp3" loop></audio>
-
       <!-- 6: jabiru -->
       <a-asset-item id="model-6" src="assets/jabiru.glb"></a-asset-item>
-      <audio id="audio-6" src="assets/jabiru.mp3" loop></audio>
-
       <!-- 7: jacana -->
       <a-asset-item id="model-7" src="assets/jacana.glb"></a-asset-item>
-      <audio id="audio-7" src="assets/jacana.mp3" loop></audio>
-
       <!-- 8: jaguarete -->
       <a-asset-item id="model-8" src="assets/jaguarete.glb"></a-asset-item>
-      <audio id="audio-8" src="assets/jaguarete.mp3" loop></audio>
-
       <!-- 9: nutria -->
       <a-asset-item id="model-9" src="assets/nutria.glb"></a-asset-item>
-      <audio id="audio-9" src="assets/nutria.mp3" loop></audio>
-
       <!-- 10: osohormiguero -->
       <a-asset-item id="model-10" src="assets/osohormiguero.glb"></a-asset-item>
-      <audio id="audio-10" src="assets/osohormiguero.mp3" loop></audio>
-
       <!-- 11: tararira -->
       <a-asset-item id="model-11" src="assets/tararira.glb"></a-asset-item>
-      <audio id="audio-11" src="assets/tararira.mp3" loop></audio>
-
       <!-- 12: tordo -->
       <a-asset-item id="model-12" src="assets/tordo.glb"></a-asset-item>
-      <audio id="audio-12" src="assets/tordo.mp3" loop></audio>
-
       <!-- 13: venado -->
       <a-asset-item id="model-13" src="assets/venado.glb"></a-asset-item>
-      <audio id="audio-13" src="assets/venado.mp3" loop></audio>
-
       <!-- 14: yacare -->
       <a-asset-item id="model-14" src="assets/yacare.glb"></a-asset-item>
-      <audio id="audio-14" src="assets/yacare.mp3" loop></audio>
 
       <!-- 15: yetapa -->
       <a-asset-item id="model-15" src="assets/yetapa.glb"></a-asset-item>
-      <audio id="audio-15" src="assets/yetapa.mp3" loop></audio>
+
+      <audio id="audio-0" src="assets/aguaraguazu.mp3" preload="auto" loop></audio>
+      <audio id="audio-1" src="assets/boacuriyu.mp3" preload="auto" loop></audio>
+      <audio id="audio-2" src="assets/caraya.mp3" preload="auto" loop></audio>
+      <audio id="audio-3" src="assets/carpincho.mp3" loop preload="auto"></audio>
+      <audio id="audio-4" src="assets/ciervo.mp3" loop preload="auto"></audio>
+      <audio id="audio-5" src="assets/dorado.mp3" loop preload="auto"></audio>
+      <audio id="audio-6" src="assets/jabiru.mp3" loop preload="auto"></audio>
+      <audio id="audio-7" src="assets/jacana.mp3" loop preload="auto"></audio>
+      <audio id="audio-8" src="assets/jaguarete.mp3" loop preload="auto"></audio>
+      <audio id="audio-9" src="assets/nutria.mp3" loop preload="auto"></audio>
+      <audio id="audio-10" src="assets/osohormiguero.mp3" loop preload="auto"></audio>
+      <audio id="audio-11" src="assets/tararira.mp3" loop preload="auto"></audio>
+      <audio id="audio-12" src="assets/tordo.mp3" loop preload="auto"></audio>
+      <audio id="audio-13" src="assets/venado.mp3" loop preload="auto"></audio>
+      <audio id="audio-14" src="assets/yacare.mp3" loop preload="auto"></audio>
+      <audio id="audio-15" src="assets/yetapa.mp3" loop preload="auto"></audio>
     </a-assets>
 
-    <!-- Lights -->
-    <!-- <a-entity light="type: directional; color: #ff0094; intensity: 1"></a-entity>  -->
-    <!-- <a-entity light="type: directional; color: #fff; intensity: 0.8" 
-    position="-0.5 1 1" castShadow: true
-    ></a-entity> -->
-    <a-light type="ambient" color="#ffcc00" intensity="0.1"></a-light>
 
-    <!-- Luz Spot 1 (Izquierda) -->
-    <a-entity light type="spot" color="##ffcc00" intensity="0.1" position="-1 2 0" rotation="-90 0 0" angle="45"
-      penumbra="0.5" decay="2">
-    </a-entity>
 
-    <!-- Luz Spot 2 (Derecha) -->
-    <!--    <a-entity light 
-       type="spot" 
-         color="##ffcc00" 
-         intensity="0.1" 
-         position="1 2 0" 
-         rotation="-90 0 0" 
-         angle="45" 
-         penumbra="0.5" 
-         decay="2">
-        </a-entity> -->
-
-    <!-- entidades para cada target -->
+                               <!-- entidades para cada target -->
     <!-- 0: aguaraguazu -->
     <a-entity mindar-image-target="targetIndex: 0" data-index="0" id="target-0">
       <a-entity gltf-model="#model-0" 
@@ -338,26 +207,44 @@
 
     </a-entity>
 
+    <!-- Luz Ambiente -->
+
+    <!-- <a-light type="ambient" color="#ffcc00" intensity="0.1"></a-light> -->
+
+    <!-- Luz Spot 1 (Izquierda) -->
+    <a-entity light type="spot" color="##ffcc00" intensity="0.1" position="-1 2 0" rotation="-90 0 0" angle="45"
+      penumbra="0.5" decay="2">
+    </a-entity>
+    <!-- Luz Spot 2 (Derecha) -->
+    <a-entity light type="spot" color="##ffcc00" intensity="0.1" position="1 2 0" rotation="-90 0 0" angle="45"
+      penumbra="0.5" decay="2">
+    </a-entity>
+    <!-- Luz Direccional color -->
+    <a-entity light="type: directional; color: #ff0094; intensity: 1"></a-entity> 
+
+
     <a-camera id="camera" position="0 0 0" look-controls="enabled: false"></a-camera>
   </a-scene>
 
-  <script>
-    AFRAME.registerComponent('force-webgl2', {
-      init: function () {
-        if (this.el.sceneEl.renderer && this.el.sceneEl.renderer.capabilities.isWebGL2) {
-          console.log('WebGL2 Activated, baby!');
 
-          this.el.sceneEl.renderer.outputEncoding = THREE.sRGBEncoding;
-        }
-      }
-    });
-        //Smooth movement
-        console.log('Ibera-AR version 0.4.4');
-  </script>
   <script src="lib/system_monitor.js"></script>
   <script src="lib/rotation.js"></script>
   <script src="lib/animations.js"></script>
   <script src="lib/main.js"></script>
-</body>
 
+</body>
+  <script>
+    // Mostrar la pantalla de carga al inicio
+    document.addEventListener('DOMContentLoaded', () => {
+      const splashScreen = document.getElementById('splash-screen');
+
+      // Escuchar el evento de carga completa de la escena
+      const scene = document.querySelector('a-scene');
+      scene.addEventListener('loaded', () => {
+        // Ocultar la pantalla de carga cuando todo esté cargado
+        splashScreen.style.display = 'none';
+      });
+    });
+        console.log('Ibera-AR version 0.4.6');
+  </script>
 </html>
