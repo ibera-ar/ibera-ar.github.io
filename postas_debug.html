@@ -3,7 +3,6 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script> -->
   <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
@@ -36,6 +35,7 @@
    -->
   <a-scene mindar-image="imageTargetSrc: assets/targets.mind;" vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: true" id="ar-scene"   
+    renderer="antialias: false; precision: low; maxCanvasWidth: 1920; maxCanvasHeight: 1080;"
     force-webgl2 
     system-monitor     
     >
@@ -213,8 +213,8 @@
       penumbra="0.5" decay="2">
     </a-entity>
     <!-- Luz Spot 2 (Derecha) -->
-    <a-entity light type="spot" color="##ffcc00" intensity="0.1" position="1 2 0" rotation="-90 0 0" angle="45"
-      penumbra="0.5" decay="2">
+    <!-- <a-entity light type="spot" color="##ffcc00" intensity="0.1" position="1 2 0" rotation="-90 0 0" angle="45"
+      penumbra="0.5" decay="2"> -->
     </a-entity>
     <!-- Luz Direccional color -->
     <!-- <a-entity light="type: directional; color: #ff0094; intensity: 1"></a-entity>  -->
@@ -222,10 +222,6 @@
   
     <a-camera id="camera" position="0 0 0" look-controls="enabled: false"></a-camera>
   </a-scene>
-
-
-
-
 </body>
 <script src="lib/system_monitor.js"></script>
 <script src="lib/rotation.js"></script>
@@ -233,19 +229,13 @@
 <script src="lib/main.js"></script>
 
   <script>
-
-    // Mostrar la pantalla de carga al inicio
     document.addEventListener('DOMContentLoaded', () => {
       const splashScreen = document.getElementById('splash-screen');
-
-      // Escuchar el evento de carga completa de la escena
       const scene = document.querySelector('a-scene');
       scene.addEventListener('loaded', () => {
-        // Ocultar la pantalla de carga cuando todo esté cargado
         splashScreen.style.display = 'none';
       });
     });
-
-        console.log('Ibera-AR version 0.4.9');
+        console.log('Ibera-AR version 0.4.10');
   </script> 
 </html>
