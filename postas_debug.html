@@ -220,20 +220,23 @@
       penumbra="0.5" decay="2">
     </a-entity>
     <!-- Luz Direccional color -->
-    <a-entity light="type: directional; color: #ff0094; intensity: 1"></a-entity> 
+    <!-- <a-entity light="type: directional; color: #333; intensity: 1"></a-entity>  -->
 
 
     <a-camera id="camera" position="0 0 0" look-controls="enabled: false"></a-camera>
   </a-scene>
 
 
-  <script src="lib/system_monitor.js"></script>
-  <script src="lib/rotation.js"></script>
-  <script src="lib/animations.js"></script>
-  <script src="lib/main.js"></script>
+
 
 </body>
+<script src="lib/system_monitor.js"></script>
+<script src="lib/rotation.js"></script>
+<script src="lib/animations.js"></script>
+<script src="lib/main.js"></script>
+
   <script>
+
     // Mostrar la pantalla de carga al inicio
     document.addEventListener('DOMContentLoaded', () => {
       const splashScreen = document.getElementById('splash-screen');
@@ -245,6 +248,7 @@
         splashScreen.style.display = 'none';
       });
     });
+
         console.log('Ibera-AR version 0.4.6');
   </script>
 </html>
